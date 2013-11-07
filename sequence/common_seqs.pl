@@ -9,10 +9,10 @@ use strict;
 my $usage = <<"USAGE";
 ===============================================================================
 Fnction: Find common sequences in fasta files.
-		 Features:
-	         1) Comparing by name or sequence are both supported.
-			 2) No files number limit.
-	         3) Low RAM usage.
+         Features:
+             1) Comparing by name or sequence are both supported.
+             2) No files number limit.
+             3) Low RAM usage.
          Note that:
              1) Records with different names may have same sequences.
              2) Case of sequence letters or name may be different.
