@@ -3,22 +3,28 @@
 # Use of this source code is governed by a MIT-license
 # that can be found in the LICENSE file.
 use Getopt::Long;
+use Digest::MD5 'md5_hex';
 use strict;
 
 my $usage = <<"USAGE";
 ===============================================================================
-Name   : Find common sequences in fasta files.
+Fnction: Find common sequences in fasta files.
 		 Features:
 	         1) Comparing by name or sequence are both supported.
 			 2) No files number limit.
 	         3) Low RAM usage.
-         Note that sequence names and case of sequence letters may be different
+         Note that:
+             1) Records with different names may have same sequences.
+             2) Case of sequence letters or name may be different.
+             3) Duplicated records may exist in a fasta file.
 Contact: Wei Shen <shenwei356#gmail.com>
+Date   : 2013-11-07
+Site   : https://github.com/shenwei356/bio_scripts
 
 Usage  : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
 Options:
-	-s Comparing by sequence.           [false]
-	-i Ignore case.                     [false]
+	-s Comparing by sequence.
+	-i Ignore case.
 ===============================================================================
 
 USAGE
@@ -29,13 +35,9 @@ GetOptions(
     "s" => \$by_seq,
     "i" => \$ignore_case,
 ) or die $usage;
-die $usage unless @ARGV >= 2;    # at least two files;
 
-if ($by_seq) {
-    use Digest::Perl::MD5 'md5_hex';
-}
-
-my $file_num = scalar @ARGV;
+# at least two files;
+die "$usage\n>2 sequence file needed.\n" unless @ARGV >= 2;
 
 my $counts = {};
 my $names  = {};
@@ -55,23 +57,31 @@ for $file (@ARGV) {
         if ($by_seq) {
             $seq =~ tr/A-Z/a-z/ if $ignore_case;
             $seq_md5 = md5_hex($seq);
-            $$counts{$seq_md5}++;
+
+            # count sequences with md5 $seq_md5 in $file
+            $$counts{$seq_md5}{$file}++;    #
+                                            # record the origin sequence name.
             $$names{$seq_md5}{$file} = $head0;
         }
         else {
-            $$counts{$head}++;
+            # count sequences with name $head in $file
+            $$counts{$head}{$file}++;
             $$names{$head}{$file} = $head0;
         }
     }
 }
 
 # output common sequences
-$file = $ARGV[0];    # export from the first file.
-
-my $names_ok = {};   # get the sequence names in the first file.
+my $file_num = scalar @ARGV;
+$file = $ARGV[0];    # extract sequences from the first file.
+my $names_ok = {};
 for my $key ( keys %$counts ) {
-    next unless $$counts{$key} == $file_num;    # every file has a same record
-    $$names_ok{ $$names{$key}{$file} } = 1;     # save to a hash.
+
+    # all files have a same record
+    next unless ( scalar keys %{ $$counts{$key} } ) == $file_num;
+
+    $$names_ok{ $$names{$key}{$file} } =
+      $$counts{$key}{$file};    # save to a hash.
 }
 
 $next_seq = FastaReader($file);
@@ -80,8 +90,11 @@ while (1) {
     last
       if $head eq "" and $seq eq "";
 
-    if ( exists $$names_ok{$head} ) {
+    if ( exists $$names_ok{$head} and $$names_ok{$head} > 0 ) {
         print ">$head\n$seq\n";
+
+        # just export one record for duplicated records.
+        $$names_ok{$head} = 0;
     }
 }
 
