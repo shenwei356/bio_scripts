@@ -1,15 +1,17 @@
 #!/usr/bin/env perl
 
-# Function: Batch compute pI/Mw via submiting sequences to Compute pI/Mw tool at ExPASy
+# Function: Batch compute pI (isoelectric point) and Mw (molecular weight)
+#           via submiting sequences to Compute pI/Mw tool at ExPASy.
 # Author  : Wei Shen <shenwei356#gmail.com> http://shenwei.me
 # Date    : 2013-10-16
-# Update  : 2013-10-16
+# Update  : 2013-11-12
 
 use strict;
 
 my $usage= <<"USAGE";
 
-Function: Batch compute pI/Mw via submiting sequences to Compute pI/Mw tool at ExPASy
+Function: Batch compute pI (isoelectric point) and Mw (molecular weight)
+          via submiting sequences to Compute pI/Mw tool at ExPASy
  Contact: Wei Shen <shenwei356#gmail.com>
    Usage: $0 amino_acid_fasta_file
     
