@@ -8,23 +8,23 @@ use strict;
 
 my $usage = <<"USAGE";
 ===============================================================================
-Fnction: Find common sequences in fasta files.
-         Features:
-             1) Comparing by name or sequence are both supported.
-             2) No files number limit.
-             3) Low RAM usage.
-         Note that:
-             1) Records with different names may have same sequences.
-             2) Case of sequence letters or name may be different.
-             3) Duplicated records may exist in a fasta file.
-Contact: Wei Shen <shenwei356#gmail.com>
-Date   : 2013-11-07
-Site   : https://github.com/shenwei356/bio_scripts
+Function: Find common sequences in fasta files.
+          Features:
+              1) Comparing by name or sequence are both supported.
+              2) No files number limit.
+              3) Low RAM usage.
+          Note that:
+              1) Records with different names may have same sequences.
+              2) Case of sequence letters or name may be different.
+              3) Duplicated records may exist in a fasta file.
+Contact : Wei Shen <shenwei356#gmail.com>
+Date    : 2013-11-07
+Site    : https://github.com/shenwei356/bio_scripts
 
-Usage  : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
-Options:
-	-s Comparing by sequence.
-	-i Ignore case.
+Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
+Options :
+	 -s Comparing by sequence.
+	 -i Ignore case.
 ===============================================================================
 
 USAGE
