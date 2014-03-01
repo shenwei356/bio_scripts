@@ -8,7 +8,7 @@
 
 use strict;
 
-my $usage= <<"USAGE";
+my $usage = <<"USAGE";
 
 Function: Batch compute pI (isoelectric point) and Mw (molecular weight)
           via submiting sequences to Compute pI/Mw tool at ExPASy
@@ -17,7 +17,7 @@ Function: Batch compute pI (isoelectric point) and Mw (molecular weight)
     
 USAGE
 die $usage
-  unless @ARGV == 1;
+    unless @ARGV == 1;
 my $aa_file = shift @ARGV;
 
 # initialize fasta file parser
@@ -38,8 +38,8 @@ while (1) {
     ( $success, $pi, $mw ) = &$PI($seq);
     unless ($success) {
         print
-"$pi. Please check whether the amino acid sequence contains illegal characters.\r\n"
-          ;    # here $pi is the status_line of response
+            "$pi. Please check whether the amino acid sequence contains illegal characters.\r\n"
+            ;    # here $pi is the status_line of response
         next;
     }
     print "$head \t$pi\t$mw\r\n";
@@ -64,16 +64,16 @@ while (1) {
 #        }
 #        print "($pi, $mw)\n";
 #    }
-sub compute_pi {
+sub compute_pi() {
     use LWP::UserAgent;
 
     my $ua  = LWP::UserAgent->new;
     my $url = "http://web.expasy.org/cgi-bin/compute_pi/pi_tool";
     my ( $res, $formdata, $result );
 
-    return sub {
+    return sub($$) {
         my ( $protein, $resolution ) = @_;
-        $resolution = "average" unless defined $resolution;   # or  monoisotopic
+        $resolution = "average" unless defined $resolution; # or  monoisotopic
         $formdata = [
             protein    => $protein,
             resolution => $resolution,
@@ -84,14 +84,14 @@ sub compute_pi {
 
         # 0 means failed
         return ( 0, $res->status_line )
-          unless $res->is_success;
+            unless $res->is_success;
 
         $result = $res->content;
         $result =~ /Theoretical pI\/Mw: ([\d\.]+)\s\/\s([\d\.]+)/;
 
         # 1 means success
         return ( 1, $1, $2 );
-      }
+        }
 }
 
 # FastaReader is a fasta file parser, which returns a function that
@@ -108,21 +108,21 @@ sub compute_pi {
 #          if $head eq "" and $seq eq "";
 #        print ">$head\n$seq\n";
 #    }
-sub FastaReader {
+sub FastaReader($) {
     my ($file) = @_;
     open IN, "<", $file
-      or die "Fail to open file: $file!\n";
+        or die "Fail to open file: $file!\n";
     local $/ = '>';
     <IN>;
     $/ = '\n';
 
     my ( $line, $head, $seq );
-    return sub {
+    return sub() {
         local $/ = '>';
         while (1) {
             $line = <IN>;
             last
-              if $line eq "";
+                if $line eq "";
 
             $line =~ s/\r?\n>?$//;
             ( $head, $seq ) = split /\r?\n/, $line, 2;
@@ -132,5 +132,5 @@ sub FastaReader {
         close IN;
         $/ = "\n";
         return ( "", "" );
-      }
+    };
 }

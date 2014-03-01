@@ -23,8 +23,8 @@ Site    : https://github.com/shenwei356/bio_scripts
 
 Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
 Options :
-	 -s Comparing by sequence.
-	 -i Ignore case.
+   -s Comparing by sequence.
+   -i Ignore case.
 ===============================================================================
 
 USAGE
@@ -49,7 +49,7 @@ for $file (@ARGV) {
     while (1) {
         ( $head, $seq ) = &$next_seq();
         last
-          if $head eq "" and $seq eq "";
+            if $head eq "" and $seq eq "";
 
         $head0 = $head;                     # orgin sequence name
         $head = lc $head if $ignore_case;
@@ -80,15 +80,15 @@ for my $key ( keys %$counts ) {
     # all files have a same record
     next unless ( scalar keys %{ $$counts{$key} } ) == $file_num;
 
-    $$names_ok{ $$names{$key}{$file} } =
-      $$counts{$key}{$file};    # save to a hash.
+    $$names_ok{ $$names{$key}{$file} }
+        = $$counts{$key}{$file};    # save to a hash.
 }
 
 $next_seq = FastaReader($file);
 while (1) {
     ( $head, $seq ) = &$next_seq();
     last
-      if $head eq "" and $seq eq "";
+        if $head eq "" and $seq eq "";
 
     if ( exists $$names_ok{$head} and $$names_ok{$head} > 0 ) {
         print ">$head\n$seq\n";
@@ -112,21 +112,21 @@ while (1) {
 #          if $head eq "" and $seq eq "";
 #        print ">$head\n$seq\n";
 #    }
-sub FastaReader {
+sub FastaReader($) {
     my ($file) = @_;
     open IN, "<", $file
-      or die "Fail to open file: $file!\n";
+        or die "Fail to open file: $file!\n";
     local $/ = '>';
     <IN>;
     $/ = '\n';
 
     my ( $line, $head, $seq );
-    return sub {
+    return sub() {
         local $/ = '>';
         while (1) {
             $line = <IN>;
             last
-              if $line eq "";
+                if $line eq "";
 
             $line =~ s/\r?\n>?$//;
             ( $head, $seq ) = split /\r?\n/, $line, 2;
@@ -136,5 +136,5 @@ sub FastaReader {
         close IN;
         $/ = "\n";
         return ( "", "" );
-      }
+    };
 }
