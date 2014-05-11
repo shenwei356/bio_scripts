@@ -4,6 +4,7 @@
 #           It works well for super big file.
 # Author  : Wei Shen <shenwei356#gmail.com> http://shenwei.me
 # Date    : 2013-08-01
+# Update  : 2014-05-11
 # Docment : http://blog.shenwei.me/extract_records_by_id_file/
 
 use strict;
@@ -17,7 +18,7 @@ my $out_file = shift;
 
 #-------------[ read ids ]-------------
 
-my %ids_hash;                  # 用字典来存储id，后面查询的时候效率更高
+my %ids_hash;                  # 用字典（查询效率更高）来存储id及每个id的命中数
 
 open ID, "<", $id_file
   or die "Failed to open file $id_file.\n";
@@ -28,7 +29,7 @@ while (<ID>) {
     # next unless /gi\|(\d+)/; # gi|12313|的情况
     next unless /(.+)/;        # 整个一行作为id的情况
     
-    $ids_hash{$1} = 1;         # 加入字典
+    $ids_hash{$1} = 0;         # 加入字典
 }
 close ID;
 
@@ -62,15 +63,18 @@ while (<NT>) {
     # 根据具体情况提取id !!!!!!!!!!!!!!!!!!!!!
     # 取出记录中的id
     # next unless $head =~ /gi\|(\d+)\|/;  # gi|12313|的情况
-    # next unless $head =~ /(.+)/;         # 整个一行作为id的情况
-    next unless $head =~ /(.+?)_/;         # 我测试的例子，勿套用
+    # next unless $head =~ /(.+?)_/;       # 我测试的例子，勿套用
+    next unless $head =~ /(.+)/;           # 整个一行作为id的情况
     
     # 在%ids_hash中查询记录
     if ( exists $ids_hash{$1} ) {
         print OUT ">$head\n$seq\n";
         
         # 如果确信目标文件中只有唯一与ID匹配的记录，则从字典中删除，提高查询速度
-        # delete $ids_hash{$1}; 
+        # delete $ids_hash{$1};
+
+        # record hit number of a id
+        $ids_hash{$1}++;
         $hits++;
     }
     print "\rProcessing ${count} th record. hits: $hits";
@@ -80,7 +84,7 @@ close NT;
 close OUT;
 
 # 显示没有匹配到任何记录的id
-my @ids = keys %ids_hash;
+my @ids = grep {$ids_hash{$_} == 0} keys %ids_hash;
 my $n = @ids;
 print "\n\n$n ids did not match any record in $seq_file:\n";
 print "@ids\n";
