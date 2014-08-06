@@ -4,7 +4,7 @@
 #           via submiting sequences to Compute pI/Mw tool at ExPASy.
 # Author  : Wei Shen <shenwei356#gmail.com> http://shenwei.me
 # Date    : 2013-10-16
-# Update  : 2013-11-12
+# Update  : 2014-07-29
 
 use strict;
 
@@ -28,6 +28,9 @@ my $PI = &compute_pi();
 
 my ( $head, $seq );
 my ( $success, $pi, $mw );
+my $out_file = "$aa_file.result.txt";
+open OUT, ">", $out_file
+    or die "fail to write file $out_file\n";
 
 while (1) {
     ( $head, $seq ) = &$next_seq();
@@ -42,9 +45,11 @@ while (1) {
             ;    # here $pi is the status_line of response
         next;
     }
-    print "$head \t$pi\t$mw\r\n";
-
+    print "$head\t$pi\t$mw\r\n";
+    print OUT "$head\t$pi\t$mw\r\n";
 }
+
+close OUT;
 
 # Compute pI/Mw via submiting sequence to Compute pI/Mw tool at ExPASy.
 #

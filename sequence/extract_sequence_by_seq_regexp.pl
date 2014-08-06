@@ -9,7 +9,7 @@ $/ = '>';<IN>;
 while ( <IN> ) {
     s/>//;
     ($head, $seq) = split "\r?\n", $_, 2;
-    if ( $seq =~ /$regex/i ){
+    if ( $seq =~ /$regex/ ){
         print ">$head\n$seq";
     }
 }

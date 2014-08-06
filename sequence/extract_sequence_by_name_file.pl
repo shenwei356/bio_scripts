@@ -5,30 +5,30 @@ $regex_file = shift;
 $seq_file   = shift;
 
 open IN, $regex_file or die "fail to open file $regex_file!\n";
-while ( <IN> ) {
+while (<IN>) {
     s/\r?\n//g;
-    s/\s+$//;
+    s/^\s+|\s+$//;
     $data{$_} = 1;
 }
 close IN;
 
-
 open IN, $seq_file or die "fail to open sequence file $seq_file!\n";
-$/ = '>';<IN>;
-while ( <IN> ) {
+$/ = '>';
+<IN>;
+while (<IN>) {
     s/>//;
     ( $head, $seq ) = split "\r?\n", $_, 2;
-    if ( defined $data{$head} ){
+    if ( defined $data{$head} ) {
         print ">$head\n$seq";
     }
 
 }
 close IN;
 
-sub usage{
+sub usage {
     die qq(
 Usage: $0 <name_file> <sequence_file> 
     
 );
 }
-    
+

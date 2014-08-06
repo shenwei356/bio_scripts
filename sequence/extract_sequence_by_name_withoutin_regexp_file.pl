@@ -7,8 +7,9 @@ $seq_file   = shift;
 open IN, $regex_file or die "fail to open file $regex_file!\n";
 while ( <IN> ) {
     s/\r?\n//g;
-    s/\s+$//;
-    $data{$_} = 1;
+    next if /^\s*$/;
+    s/^\s+|\s+$//;
+    $data{quotemeta $_} = 1;
 }
 close IN;
 @keys = keys %data;
@@ -24,6 +25,7 @@ while ( <IN> ) {
         print ">$head\n$seq";
     }
 }
+$/ = "\n";
 close IN;
 
 sub usage{

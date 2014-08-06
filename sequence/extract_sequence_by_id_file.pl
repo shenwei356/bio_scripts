@@ -4,7 +4,7 @@
 #           It works well for super big file.
 # Author  : Wei Shen <shenwei356#gmail.com> http://shenwei.me
 # Date    : 2013-08-01
-# Update  : 2014-05-11
+# Update  : 2014-08-06
 # Docment : http://blog.shenwei.me/extract_records_by_id_file/
 
 use strict;
@@ -24,6 +24,8 @@ open ID, "<", $id_file
   or die "Failed to open file $id_file.\n";
 while (<ID>) {
     s/\r?\n//;                 # 记得把回车\r和换行符\n删掉
+    next if /^\s*$/;
+    s/^\s+|\s+$//;
     
     # 根据具体情况提取id !!!!!!
     # next unless /gi\|(\d+)/; # gi|12313|的情况
