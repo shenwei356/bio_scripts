@@ -62,11 +62,7 @@ sub FastaReader {
     my ( $line, $head, $seq );
     return sub {
         local $/ = '>';
-        while (1) {
-            $line = <IN>;
-            last
-                if $line eq "";
-
+        while ( $line = <IN> ) {
             $line =~ s/\r?\n>?$//;
             ( $head, $seq ) = split /\r?\n/, $line, 2;
             $seq =~ s/\s+//g;
@@ -75,7 +71,7 @@ sub FastaReader {
         close IN;
         $/ = "\n";
         return ( "", "" );
-        }
+    };
 }
 
 1;

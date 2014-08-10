@@ -19,6 +19,7 @@ Function: Find common sequences in fasta files. Version 2.
               3) Duplicated records may exist in a fasta file.
 Contact : Wei Shen <shenwei356#gmail.com>
 Date    : 2013-12-05
+Update  : 2014-08-10
 Site    : https://github.com/shenwei356/bio_scripts
 
 Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]

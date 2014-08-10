@@ -19,6 +19,7 @@ Function: Find common sequences in fasta files.
               3) Duplicated records may exist in a fasta file.
 Contact : Wei Shen <shenwei356#gmail.com>
 Date    : 2013-11-07
+Update  : 2014-08-10
 Site    : https://github.com/shenwei356/bio_scripts
 
 Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
@@ -121,13 +122,9 @@ sub FastaReader($) {
     $/ = '\n';
 
     my ( $line, $head, $seq );
-    return sub() {
+    return sub {
         local $/ = '>';
-        while (1) {
-            $line = <IN>;
-            last
-                if $line eq "";
-
+        while ( $line = <IN> ) {
             $line =~ s/\r?\n>?$//;
             ( $head, $seq ) = split /\r?\n/, $line, 2;
             $seq =~ s/\s+//g;
