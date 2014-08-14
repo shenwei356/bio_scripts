@@ -19,7 +19,7 @@ Function: Find common sequences in fasta files.
               3) Duplicated records may exist in a fasta file.
 Contact : Wei Shen <shenwei356#gmail.com>
 Date    : 2013-11-07
-Update  : 2014-08-10
+Update  : 2014-08-14
 Site    : https://github.com/shenwei356/bio_scripts
 
 Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
@@ -38,7 +38,7 @@ GetOptions(
 ) or die $usage;
 
 # at least two files;
-die "$usage\n>2 sequence file needed.\n" unless @ARGV >= 2;
+die "$usage\n>= 2 sequence file needed.\n" unless @ARGV >= 2;
 
 my $counts = {};
 my $names  = {};
@@ -47,10 +47,8 @@ my ( $file, $next_seq, $head, $head0, $seq, $seq_md5 );
 
 for $file (@ARGV) {
     $next_seq = FastaReader($file);
-    while (1) {
-        ( $head, $seq ) = &$next_seq();
-        last
-            if $head eq "" and $seq eq "";
+    while ( my $fa = &$next_seq() ) {
+        ( $head, $seq ) = @$fa;
 
         $head0 = $head;                     # orgin sequence name
         $head = lc $head if $ignore_case;
@@ -86,10 +84,8 @@ for my $key ( keys %$counts ) {
 }
 
 $next_seq = FastaReader($file);
-while (1) {
-    ( $head, $seq ) = &$next_seq();
-    last
-        if $head eq "" and $seq eq "";
+while ( my $fa = &$next_seq() ) {
+    ( $head, $seq ) = @$fa;
 
     if ( exists $$names_ok{$head} and $$names_ok{$head} > 0 ) {
         print ">$head\n$seq\n";
@@ -99,39 +95,66 @@ while (1) {
     }
 }
 
-# FastaReader is a fasta file parser, which returns a function that
-# returns a pair of head and sequence when it was called
+# FastaReader is a fasta file parser using closure.
+# FastaReader returns an anonymous subroutine, when called, it
+# will return a fasta record which is reference of an array
+# containing fasta header and sequence.
+#
+# A boolean argument is optional. If set as "true", "return" ("\r") and
+# "new line" ("\n") symbols in sequence will not be trimed.
 #
 # Example:
 #
+#    # my $next_seq = FastaReader("test.fa", 1);
 #    my $next_seq = FastaReader("test.fa");
 #
-#    my ( $head, $seq );
-#    while (1) {
-#        ( $head, $seq ) = &$next_seq();
-#        last
-#          if $head eq "" and $seq eq "";
-#        print ">$head\n$seq\n";
+#    while ( my $fa = &$next_seq() ) {
+#        my ( $header, $seq ) = @$fa;
+#
+#        print ">$header\n$seq\n";
 #    }
-sub FastaReader($) {
-    my ($file) = @_;
-    open IN, "<", $file
-        or die "Fail to open file: $file!\n";
-    local $/ = '>';
-    <IN>;
-    $/ = '\n';
+#
+sub FastaReader {
+    my ( $file, $not_trim ) = @_;
 
-    my ( $line, $head, $seq );
+    my ( $last_header, $seq_buffer ) = ( '', '' ); # buffer for header and seq
+    my ( $header,      $seq )        = ( '', '' ); # current header and seq
+    my $finished = 0;
+
+    open FH, "<", $file
+        or die "fail to open file: $file!\n";
+
     return sub {
-        local $/ = '>';
-        while ( $line = <IN> ) {
-            $line =~ s/\r?\n>?$//;
-            ( $head, $seq ) = split /\r?\n/, $line, 2;
-            $seq =~ s/\s+//g;
-            return ( $head, $seq );
+
+        if ($finished) {                           # end of file
+            return undef;
         }
-        close IN;
-        $/ = "\n";
-        return ( "", "" );
+
+        while (<FH>) {
+            s/^\s+//;    # remove the space at the front of line
+
+            if (/^>(.*)/) {    # header line
+                ( $header, $last_header ) = ( $last_header, $1 );
+                ( $seq,    $seq_buffer )  = ( $seq_buffer,  '' );
+
+                # only output fasta records with non-blank header
+                if ( $header ne '' ) {
+                    $seq =~ s/\s+//g unless $not_trim;
+                    return [ $header, $seq ];
+                }
+            }
+            else {
+                $seq_buffer .= $_;    # append seq
+            }
+        }
+        close FH;
+        $finished = 1;
+
+        # last record
+        # only output fasta records with non-blank header
+        if ( $last_header ne '' ) {
+            $seq_buffer =~ s/\s+//g unless $not_trim;
+            return [ $last_header, $seq_buffer ];
+        }
     };
 }

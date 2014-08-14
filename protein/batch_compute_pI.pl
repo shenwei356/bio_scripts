@@ -32,11 +32,8 @@ my $out_file = "$aa_file.result.txt";
 open OUT, ">", $out_file
     or die "fail to write file $out_file\n";
 
-while (1) {
-    ( $head, $seq ) = &$next_seq();
-    last if $head eq "" and $seq eq "";
-
-    # print ">$head\n$seq\n";
+while ( my $fa = &$next_seq() ) {
+    my ( $header, $seq ) = @$fa;
 
     ( $success, $pi, $mw ) = &$PI($seq);
     unless ($success) {
@@ -45,8 +42,8 @@ while (1) {
             ;    # here $pi is the status_line of response
         next;
     }
-    print "$head\t$pi\t$mw\r\n";
-    print OUT "$head\t$pi\t$mw\r\n";
+    print "$header\t$pi\t$mw\r\n";
+    print OUT "$header\t$pi\t$mw\r\n";
 }
 
 close OUT;
@@ -99,43 +96,66 @@ sub compute_pi() {
         }
 }
 
-# FastaReader is a fasta file parser, which returns a function that
-# returns a pair of head and sequence when it was called
+# FastaReader is a fasta file parser using closure.
+# FastaReader returns an anonymous subroutine, when called, it
+# will return a fasta record which is reference of an array
+# containing fasta header and sequence.
+#
+# A boolean argument is optional. If set as "true", "return" ("\r") and
+# "new line" ("\n") symbols in sequence will not be trimed.
 #
 # Example:
 #
+#    # my $next_seq = FastaReader("test.fa", 1);
 #    my $next_seq = FastaReader("test.fa");
 #
-#    my ( $head, $seq );
-#    while (1) {
-#        ( $head, $seq ) = &$next_seq();
-#        last
-#          if $head eq "" and $seq eq "";
-#        print ">$head\n$seq\n";
+#    while ( my $fa = &$next_seq() ) {
+#        my ( $header, $seq ) = @$fa;
+#
+#        print ">$header\n$seq\n";
 #    }
-sub FastaReader($) {
-    my ($file) = @_;
-    open IN, "<", $file
-        or die "Fail to open file: $file!\n";
-    local $/ = '>';
-    <IN>;
-    $/ = '\n';
+#
+sub FastaReader {
+    my ( $file, $not_trim ) = @_;
 
-    my ( $line, $head, $seq );
-    return sub() {
-        local $/ = '>';
-        while (1) {
-            $line = <IN>;
-            last
-                if $line eq "";
+    my ( $last_header, $seq_buffer ) = ( '', '' ); # buffer for header and seq
+    my ( $header,      $seq )        = ( '', '' ); # current header and seq
+    my $finished = 0;
 
-            $line =~ s/\r?\n>?$//;
-            ( $head, $seq ) = split /\r?\n/, $line, 2;
-            $seq =~ s/\s+//g;
-            return ( $head, $seq );
+    open FH, "<", $file
+        or die "fail to open file: $file!\n";
+
+    return sub {
+
+        if ($finished) {                           # end of file
+            return undef;
         }
-        close IN;
-        $/ = "\n";
-        return ( "", "" );
+
+        while (<FH>) {
+            s/^\s+//;    # remove the space at the front of line
+
+            if (/^>(.*)/) {    # header line
+                ( $header, $last_header ) = ( $last_header, $1 );
+                ( $seq,    $seq_buffer )  = ( $seq_buffer,  '' );
+
+                # only output fasta records with non-blank header
+                if ( $header ne '' ) {
+                    $seq =~ s/\s+//g unless $not_trim;
+                    return [ $header, $seq ];
+                }
+            }
+            else {
+                $seq_buffer .= $_;    # append seq
+            }
+        }
+        close FH;
+        $finished = 1;
+
+        # last record
+        # only output fasta records with non-blank header
+        if ( $last_header ne '' ) {
+            $seq_buffer =~ s/\s+//g unless $not_trim;
+            return [ $last_header, $seq_buffer ];
+        }
     };
 }
