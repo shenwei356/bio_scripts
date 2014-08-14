@@ -3,6 +3,8 @@ Bio_scripts
 
 Some scripts in bioinformatics.
 
+See more utilitis in BioUtil module from [CPAN](http://search.cpan.org/search?query=BioUtil&mode=all) 
+
 -------
 
 Copyright (c) 2013, Wei Shen (shenwei356@gmail.com)

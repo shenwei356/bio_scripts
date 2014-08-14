@@ -18,23 +18,19 @@ my $seq_file   = shift;
 
 my $names = get_list_from_file($regex_file);
 
-my $next_seq = FastaReader( $seq_file, 1 );
+my $next_seq = FastaReader($seq_file, 1);
 while ( my $fa = &$next_seq() ) {
     my ( $head, $seq ) = @$fa;
-
-    for (@$names) {
-        if ( $head =~ /$_/ ) {
-            print ">$head\n$seq";
-            last;
-        }
+    my @in = grep { $_ if $head =~ /$_/i } @$names;
+    # print "@in\n" if @in > 0;
+    if ( @in == 0){
+        print ">$head\n$seq";
     }
-
 }
 
-sub usage {
+sub usage{
     die qq(
 Usage: $0 <regular expression file> <sequence_file> 
     
 );
 }
-

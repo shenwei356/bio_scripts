@@ -8,6 +8,15 @@
 
 use strict;
 
+# try to use BioUtil::Seq
+if ( eval { require BioUtil::Seq; 1; } ne 1 ) {
+    die "\nPlease install BioUtil::Seq by CPAN:\n"
+        . "  cpan install BioUtil\n\n";
+}
+else {
+    BioUtil::Seq->import();
+}
+
 my $usage = <<"USAGE";
 
 Function: Batch compute pI (isoelectric point) and Mw (molecular weight)
@@ -94,68 +103,4 @@ sub compute_pi() {
         # 1 means success
         return ( 1, $1, $2 );
         }
-}
-
-# FastaReader is a fasta file parser using closure.
-# FastaReader returns an anonymous subroutine, when called, it
-# will return a fasta record which is reference of an array
-# containing fasta header and sequence.
-#
-# A boolean argument is optional. If set as "true", "return" ("\r") and
-# "new line" ("\n") symbols in sequence will not be trimed.
-#
-# Example:
-#
-#    # my $next_seq = FastaReader("test.fa", 1);
-#    my $next_seq = FastaReader("test.fa");
-#
-#    while ( my $fa = &$next_seq() ) {
-#        my ( $header, $seq ) = @$fa;
-#
-#        print ">$header\n$seq\n";
-#    }
-#
-sub FastaReader {
-    my ( $file, $not_trim ) = @_;
-
-    my ( $last_header, $seq_buffer ) = ( '', '' ); # buffer for header and seq
-    my ( $header,      $seq )        = ( '', '' ); # current header and seq
-    my $finished = 0;
-
-    open FH, "<", $file
-        or die "fail to open file: $file!\n";
-
-    return sub {
-
-        if ($finished) {                           # end of file
-            return undef;
-        }
-
-        while (<FH>) {
-            s/^\s+//;    # remove the space at the front of line
-
-            if (/^>(.*)/) {    # header line
-                ( $header, $last_header ) = ( $last_header, $1 );
-                ( $seq,    $seq_buffer )  = ( $seq_buffer,  '' );
-
-                # only output fasta records with non-blank header
-                if ( $header ne '' ) {
-                    $seq =~ s/\s+//g unless $not_trim;
-                    return [ $header, $seq ];
-                }
-            }
-            else {
-                $seq_buffer .= $_;    # append seq
-            }
-        }
-        close FH;
-        $finished = 1;
-
-        # last record
-        # only output fasta records with non-blank header
-        if ( $last_header ne '' ) {
-            $seq_buffer =~ s/\s+//g unless $not_trim;
-            return [ $last_header, $seq_buffer ];
-        }
-    };
 }
