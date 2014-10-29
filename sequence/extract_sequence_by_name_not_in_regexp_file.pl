@@ -1,5 +1,4 @@
-﻿#!/usr/bin/perl
-
+#!/usr/bin/env perl
 use strict;
 
 # try to use BioUtil::Seq
