@@ -35,12 +35,14 @@ See more: https://github.com/shenwei356/bio_scripts
 my $help       = 0;
 my $enzymefile = "";
 my $seqfile    = "";
+my $listfile   = "";
 my $threshold  = 1 << 30;
 
 GetOptions(
     'help|h' => \$help,
     'e=s'    => \$enzymefile,
     'i=s'    => \$seqfile,
+    'l=s'    => \$listfile,
     't=i'    => \$threshold,
 ) or die $usage;
 
@@ -54,8 +56,7 @@ my $enzs     = parse_embossre($enzymefile);
 my %subenzs  = ();
 my %listhash = ();
 
-my $listfile = shift @ARGV;
-if ( defined $listfile ) {
+if ( $listfile ne "" ) {
     my $list = get_list_from_file($listfile);
     %listhash = map { $_ => 0 } @$list;
     for my $enz ( keys %$enzs ) {
@@ -88,7 +89,7 @@ while ( my $fa = &$next_seq() ) {
         # check enzyme digest site
         if ( $seq =~ /$pattern/ or $revcom =~ /$pattern/ ) {
             $listhash{$enz}++;
-            if ($listhash{$enz} >= $threshold) {
+            if ( $listhash{$enz} >= $threshold ) {
                 delete $subenzs{$enz};
                 delete $listhash{$enz};
             }
