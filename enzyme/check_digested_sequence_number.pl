@@ -90,6 +90,7 @@ while ( my $fa = &$next_seq() ) {
             $listhash{$enz}++;
             if ($listhash{$enz} >= $threshold) {
                 delete $subenzs{$enz};
+                delete $listhash{$enz};
             }
         }
     }
