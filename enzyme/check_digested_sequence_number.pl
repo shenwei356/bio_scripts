@@ -10,21 +10,48 @@
 
 use strict;
 use File::Basename;
+use Getopt::Long;
+
 use BioUtil::Misc;
 use BioUtil::Seq;
 use BioUtil::Util;
 
 my $usage = sprintf "
-Usage: %s <embossre.enz> <fasta file> [enzyme list file]
+Usage: %s [options]
 
-", basename($0);
-die $usage unless @ARGV == 3 or @ARGV == 2;
+Options:
+    -e FILE    Enzymefile (from Rebase)
+    -i FILE    Fasta file
+    -l FILE    Enzyme list file
+    -t INT     Threshold  [%d]
 
-my $enzymefile = shift @ARGV;
-my $seqfile    = shift @ARGV;
+Example:
+    
+    %s -e embossre.enz -i test.fasta -t 10
 
-my $enzs    = parse_embossre($enzymefile);
-my %subenzs = ();
+See more: https://github.com/shenwei356/bio_scripts
+", basename($0), 1 << 30, basename($0);
+
+my $help       = 0;
+my $enzymefile = "";
+my $seqfile    = "";
+my $threshold  = 1 << 30;
+
+GetOptions(
+    'help|h' => \$help,
+    'e=s'    => \$enzymefile,
+    'i=s'    => \$seqfile,
+    't=i'    => \$threshold,
+) or die $usage;
+
+die $usage if $help;
+die $usage unless $enzymefile ne "" and $seqfile ne "";
+die "threshold should > 0\n" unless $threshold > 0;
+
+# ===============================================================
+
+my $enzs     = parse_embossre($enzymefile);
+my %subenzs  = ();
 my %listhash = ();
 
 my $listfile = shift @ARGV;
@@ -42,11 +69,11 @@ else {
 }
 
 %listhash = ();
-%listhash = map { $_ => 0 } keys %subenzs ;
+%listhash = map { $_ => 0 } keys %subenzs;
 
 # show process
 local $| = 1;
-my $n    = 0;
+my $n = 0;
 
 my $next_seq = FastaReader($seqfile);
 while ( my $fa = &$next_seq() ) {
@@ -61,6 +88,9 @@ while ( my $fa = &$next_seq() ) {
         # check enzyme digest site
         if ( $seq =~ /$pattern/ or $revcom =~ /$pattern/ ) {
             $listhash{$enz}++;
+            if ($listhash{$enz} >= $threshold) {
+                delete $subenzs{$enz};
+            }
         }
     }
 
@@ -72,5 +102,5 @@ $| = 0;
 
 print STDERR "\n";
 for ( sort { $listhash{$b} <=> $listhash{$a} } keys %listhash ) {
-    print "$_: $listhash{$_} / $n\n";
+    print "$_\t$listhash{$_}\n";
 }
