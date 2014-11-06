@@ -57,7 +57,6 @@ while ( my $fa = &$next_seq() ) {
         my $pattern = $$e{pattern_regexp};
         # check enzyme digest site
         if ( $seq =~ /$pattern/ or $revcom =~ /$pattern/ ) {
-            print "$pattern\n";
             delete $subenzs{$enz};
         }
     }
