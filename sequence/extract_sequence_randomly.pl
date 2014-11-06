@@ -33,7 +33,7 @@ for my $file (@ARGV) {
 
         next unless rand() < $p;
         $n++;
-        print ">$header\t$seq";
+        print ">$header\n$seq";
     }
 }
 

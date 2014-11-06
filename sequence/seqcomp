@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use strict;
+
+my $seq = shift @ARGV;
+$seq =~ tr/ACGTRYMKSWBDHVNacgtrymkswbdhvn/TGCAYRKMWSVHDBNtgcayrkmwsvhdbn/;
+print "$seq\n";

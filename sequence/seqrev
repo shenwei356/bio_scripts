@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use strict;
+
+my $seq = shift @ARGV;
+$seq = reverse $seq;
+print "$seq\n";

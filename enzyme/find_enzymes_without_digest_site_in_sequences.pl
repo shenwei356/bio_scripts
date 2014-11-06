@@ -52,20 +52,20 @@ while ( my $fa = &$next_seq() ) {
     $seq = uc $seq;
     my $revcom = revcom($seq);
 
+    for my $enz ( keys %subenzs ) {
+        my $e       = $subenzs{$enz};
+        my $pattern = $$e{pattern_regexp};
+        # check enzyme digest site
+        if ( $seq =~ /$pattern/ or $revcom =~ /$pattern/ ) {
+            print "$pattern\n";
+            delete $subenzs{$enz};
+        }
+    }
+
     # show process
     $n++;
     $left = scalar keys %subenzs;
     print STDERR "\rcheck seq $n, candidate: $left / $sum";
-
-    for my $enz ( keys %subenzs ) {
-        my $e       = $subenzs{$enz};
-        my $pattern = $$e{pattern};
-
-        # check enzyme digest site
-        if ( index( $seq, $pattern ) > 0 or index( $revcom, $pattern ) > 0 ) {
-            delete $subenzs{$enz};
-        }
-    }
 }
 $| = 0;
 
