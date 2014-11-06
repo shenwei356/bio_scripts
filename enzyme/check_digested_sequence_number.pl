@@ -25,11 +25,12 @@ my $seqfile    = shift @ARGV;
 
 my $enzs    = parse_embossre($enzymefile);
 my %subenzs = ();
+my %listhash = ();
 
 my $listfile = shift @ARGV;
 if ( defined $listfile ) {
     my $list = get_list_from_file($listfile);
-    my %listhash = map { $_ => 0 } @$list;
+    %listhash = map { $_ => 0 } @$list;
     for my $enz ( keys %$enzs ) {
         if ( exists $listhash{$enz} ) {
             $subenzs{$enz} = $$enzs{$enz};
@@ -40,11 +41,12 @@ else {
     %subenzs = %$enzs;
 }
 
+%listhash = ();
+%listhash = map { $_ => 0 } keys %subenzs ;
+
 # show process
 local $| = 1;
 my $n    = 0;
-my $sum  = scalar keys %subenzs;
-my $left = $sum;
 
 my $next_seq = FastaReader($seqfile);
 while ( my $fa = &$next_seq() ) {
@@ -55,18 +57,20 @@ while ( my $fa = &$next_seq() ) {
     for my $enz ( keys %subenzs ) {
         my $e       = $subenzs{$enz};
         my $pattern = $$e{pattern_regexp};
+
         # check enzyme digest site
         if ( $seq =~ /$pattern/ or $revcom =~ /$pattern/ ) {
-            delete $subenzs{$enz};
+            $listhash{$enz}++;
         }
     }
 
     # show process
     $n++;
-    $left = scalar keys %subenzs;
-    print STDERR "\rcheck seq $n, candidate: $left / $sum";
+    print STDERR "\rcheck seq $n";
 }
 $| = 0;
 
 print STDERR "\n";
-print "$_\n" for sort keys %subenzs;
+for ( sort { $listhash{$b} <=> $listhash{$a} } keys %listhash ) {
+    print "$_: $listhash{$_} / $n\n";
+}
