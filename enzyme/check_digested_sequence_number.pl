@@ -57,7 +57,7 @@ my %subenzs  = ();
 my %listhash = ();
 
 if ( $listfile ne "" ) {
-    my $list = get_list_from_file($listfile);
+    my $list = get_column_data($listfile, 1);
     %listhash = map { $_ => 0 } @$list;
     for my $enz ( keys %$enzs ) {
         if ( exists $listhash{$enz} ) {
@@ -104,5 +104,7 @@ $| = 0;
 
 print STDERR "\n";
 for ( sort { $listhash{$b} <=> $listhash{$a} } keys %listhash ) {
-    print "$_\t$listhash{$_}\n";
+    my $e       = $subenzs{$_};
+    my $pattern = $$e{pattern};
+    printf "%s\t%s\t%s\n", $_, $pattern, $listhash{$_};
 }
