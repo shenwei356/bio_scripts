@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+import sys
+import os
+
+from Bio import SeqIO
+
+import seaborn as sns
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+usage = """
+Usage: fasta_seq_length.py fastafile [fastafile...]
+"""
+
+if len(sys.argv) <= 1:
+    print(usage)
+    sys.exit(0)
+
+lengths = []
+
+for file in sys.argv[1:]:
+    if not os.path.exists(file):
+        print("file not exists: %s" % file)
+        sys.exit(0)
+
+    with open(file + ".len", 'w') as fh:
+        for seq in SeqIO.parse(file, "fasta"):
+            lengths.append(len(seq))
+            fh.write("%s\t%d\n" % (seq.id, len(seq)))
+
+mpl.rc("figure", figsize=(8, 4))
+sns.distplot(lengths)
+plt.savefig(file + ".len.png")
