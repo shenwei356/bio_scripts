@@ -1,24 +1,17 @@
 #!/usr/bin/env perl
-
-# Copyright 2014 Wei Shen (shenwei356#gmail.com). All rights reserved.
-# Use of this source code is governed by a MIT-license
-# that can be found in the LICENSE file.
-# https://github.com/shenwei356
+# https://github.com/shenwei356/bio_scripts
 
 use strict;
 
-# try to use BioUtil::Seq
-if ( eval { require BioUtil::Seq; 1; } ne 1 ) {
-    die "\nPlease install BioUtil::Seq by CPAN:\n"
-        . "  cpan install BioUtil\n\n";
-}
-else {
-    BioUtil::Seq->import();
-}
+use File::Basename;
+use BioUtil::Seq;
 
+$0 = basename($0);
 my $usage = <<USAGE;
 
-usage: fasta_seq_length <infile> [infile ...]
+Usage: $0 <infile> [infile ...]
+
+https://github.com/shenwei356/bio_scripts
 
 USAGE
 

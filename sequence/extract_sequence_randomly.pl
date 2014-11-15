@@ -1,21 +1,27 @@
 #!/usr/bin/env perl
-
-# Copyright 2014 Wei Shen (shenwei356#gmail.com). All rights reserved.
-# Use of this source code is governed by a MIT-license
-# that can be found in the LICENSE file.
-# https://github.com/shenwei356/bio_scripts/
+# https://github.com/shenwei356/bio_scripts
 
 use strict;
 
+use File::Basename;
 use BioUtil::Seq;
-use BioUtil::Util;
 
+$0 = basename($0);
 my $usage = <<USAGE;
 
-usage: extract_sequence_randomly.pl <probability> [fasta file ...]
+Randomly extract fasta sequences by a given proportion
+
+Examples: 
+
+    1) $0 0.1 seq.fa
+    2) $0 0.1 seq.fa seq2.fa   # multi files supported
+    3) $0 0.1 seq*.fa          # glob expression
+    4) cat seq.fa | $0 0.1     # read from STDIN
+
+https://github.com/shenwei356/bio_scripts
 
 USAGE
-die $usage unless @ARGV >= 2;
+die $usage unless @ARGV >= 1;
 
 my $p = shift @ARGV;
 die "Probability should between 0 and 1\n"
@@ -23,10 +29,21 @@ die "Probability should between 0 and 1\n"
     and $p > 0
     and $p <= 1;
 
-my $n = 0;
-for my $file (@ARGV) {
-    srand();
+srand();
 
+my @files = ();
+
+for my $file (@ARGV) {
+    for my $f ( glob $file ) {
+        push @files, $f;
+    }
+}
+if ( @files == 0 ) {
+    push @files, 'STDIN';
+}
+
+my $n = 0;
+for my $file (@files) {
     my $next_seq = FastaReader( $file, 1 );
     while ( my $fa = &$next_seq() ) {
         my ( $header, $seq ) = @$fa;

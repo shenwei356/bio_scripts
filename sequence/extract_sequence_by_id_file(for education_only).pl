@@ -4,22 +4,21 @@
 #           It works well for super big file.
 # Author  : Wei Shen <shenwei356#gmail.com> http://shenwei.me
 # Date    : 2013-08-01
-# Update  : 2014-08-06
+# Update  : 2014-11-14
 # Docment : http://blog.shenwei.me/extract_records_by_id_file/
 
 use strict;
+use File::Basename;
+use BioUtil::Util;
 
-# try to use BioUtil::Seq
-if ( eval { require BioUtil::Seq; 1; } ne 1 ) {
-    die "\nPlease install BioUtil::Seq by CPAN:\n"
-        . "  cpan install BioUtil::Seq\n\n";
-}
-else {
-    BioUtil::Seq->import();
-}
+$0 = basename($0);
+my $usage = <<USAGE;
 
-die "Usage: $0 <id_file> <seq_file> <out_file>\n"
-    unless @ARGV == 3;
+Usage: $0 <id_file> <seq_file> <out_file>
+
+USAGE
+
+die $usage unless @ARGV == 3;
 
 my $id_file  = shift;
 my $seq_file = shift;

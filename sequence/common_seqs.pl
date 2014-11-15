@@ -1,19 +1,11 @@
 #!/usr/bin/env perl
-# Copyright 2013 Wei Shen (shenwei356#gmail.com). All rights reserved.
+# Copyright 2014 Wei Shen (shenwei356#gmail.com). All rights reserved.
 # Use of this source code is governed by a MIT-license
 # that can be found in the LICENSE file.
+use strict;
 use Getopt::Long;
 use Digest::MD5 'md5_hex';
-use strict;
-
-# try to use BioUtil::Seq
-if ( eval { require BioUtil::Seq; 1; } ne 1 ) {
-    die "\nPlease install BioUtil::Seq by CPAN:\n"
-        . "  cpan install BioUtil\n\n";
-}
-else {
-    BioUtil::Seq->import();
-}
+use BioUtil::Seq;
 
 my $usage = <<"USAGE";
 ===============================================================================

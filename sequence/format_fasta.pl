@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
 use strict;
 use BioUtil::Seq;
 
-die "$0 <seq.fa> \n" unless @ARGV == 1;
+die "format_fasta.pl <seq.fa> \n" unless @ARGV == 1;
 my $seqfile = shift @ARGV;
 
 my $next_seq = FastaReader($seqfile);
