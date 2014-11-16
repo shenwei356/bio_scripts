@@ -26,12 +26,12 @@ Options:
 Examples:
 
     1) sequences WITH "bacteria" in header
-        $0 -r -p Bacteria seq*.fa > result.fa
+        $0 -r -p Bacteria *.fa > result.fa
     2) sequences WITHOUT "bacteria" in header
         $0 -r -n -p Bacteria seq1.fa seq2.fa > result.fa
     3) sequences with GATATC (EcoRV digest site) in SEQUENCE
-        $0 -s -p GATATC seq.fa > result.fa
-    4) sequences (read from STDIN ) with header that match any patterns
+        $0 -r -s -p GATATC seq.fa > result.fa
+    4) sequences (read from STDIN ) with header that matches any patterns
        in list file
         zcat seq.fa.gz | $0 -pf name_list.txt > result.fa
 
