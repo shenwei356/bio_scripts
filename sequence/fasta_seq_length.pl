@@ -3,32 +3,25 @@
 
 use strict;
 
-use File::Basename;
 use BioUtil::Seq;
 
-$0 = basename($0);
-my $usage = <<USAGE;
-
-Usage: $0 <infile> [infile ...]
-
-https://github.com/shenwei356/bio_scripts
-
-USAGE
-
-die $usage unless @ARGV > 0;
-
+# get the file list
+my @files = ();
 for my $file (@ARGV) {
-    my $outfile = "$file.len";
-    open OUT, ">", $outfile
-        or die "failed to open file: $outfile\n";
+    for my $f ( glob $file ) {
+        push @files, $f;
+    }
+}
+if ( @files == 0 ) {
+    push @files, 'STDIN';
+}
 
+for my $file (@files) {
     my $next_seq = FastaReader($file);
     while ( my $fa = &$next_seq() ) {
         my ( $header, $seq ) = @$fa;
 
         my $len = length($seq);
-        print OUT "$header\t$len\n";
+        print "$header\t$len\n";
     }
-
-    close OUT;
 }

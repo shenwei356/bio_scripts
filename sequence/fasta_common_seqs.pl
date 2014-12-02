@@ -3,10 +3,12 @@
 # Use of this source code is governed by a MIT-license
 # that can be found in the LICENSE file.
 use strict;
+use File::Basename;
 use Getopt::Long;
 use Digest::MD5 'md5_hex';
 use BioUtil::Seq;
 
+$0 = basename($0);
 my $usage = <<"USAGE";
 ===============================================================================
 Function: Find common sequences in fasta files.

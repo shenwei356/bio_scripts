@@ -11,7 +11,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 usage = """
-Usage: fasta_seq_length.py fastafile [fastafile...]
+Usage: fasta_seq_length_plot.py fastafile [fastafile...]
 """
 
 if len(sys.argv) <= 1:
@@ -27,8 +27,9 @@ for file in sys.argv[1:]:
 
     with open(file + ".len", 'w') as fh:
         for seq in SeqIO.parse(file, "fasta"):
-            lengths.append(len(seq))
-            fh.write("%s\t%d\n" % (seq.id, len(seq)))
+            l = len(seq)
+            lengths.append(l)
+            fh.write("%s\t%d\n" % (seq.id, l))
 
 mpl.rc("figure", figsize=(8, 4))
 sns.distplot(lengths)
