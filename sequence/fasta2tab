@@ -1,28 +1,55 @@
 #!/usr/bin/env perl
 # https://github.com/shenwei356/bio_scripts
-#
-# fasta2tab - transfrom the fasta fromat to two-column table
-#
-# This script is usually used in pair with tab2fasta.
-#
-# Examples:
-#
-#    1. sort fasta by sequnece length
-#
-#       cat seq.fa \
-#         | fasta2tab  \
-#         | awk -F"\t" ' {printf "%s\t%s\t%d\n", $1, $2 ,length($2) } ' \
-#         | sort -k3,3 \
-#         | tab2fasta \
-#         > seq.sorted.fa
-#
-#   2. extract sequence longer than 1000 bp
-#
-#       fasta2tab seq.fa | awk -F'\t' 'length $2 >= 1000' | tab2fasta
-#
 
 use strict;
+use Getopt::Long;
 use BioUtil::Seq;
+
+my $usage = q(
+fasta2tab - transfrom the fasta fromat to two-column table
+
+Usage: $0 [options] [fastafiles...]
+Options:
+    
+    -r,  --reverse             Reverse sequence
+    -c,  --complement          Complement sequence
+    -rc, --reversecomplement   Reversecomplement
+    -t,  --trim                Trim non-Latin alphabet
+    -lc, --lowercase           Lowercase
+    -uc, --uppercase           Uppercase
+    -h,  --help                Show this help information
+
+Examples:
+
+    1. sort fasta by sequnece length
+       cat seq.fa \
+         | fasta2tab  \
+         | awk -F"\t" ' {printf "%s\t%s\t%d\n", $1, $2 ,length($2) } ' \
+         | sort -k3,3 \
+         | tab2fasta \
+         > seq.sorted.fa
+
+    2. extract sequence longer than 1000 bp
+       fasta2tab seq.fa | awk -F'\t' 'length $2 >= 1000' | tab2fasta
+
+
+This script is usually used in pair with tab2fasta.
+https://github.com/shenwei356/bio_scripts
+
+);
+
+my $para = {};
+GetOptions(
+    'help|h'               => \$$para{help},
+    'reverse|r'            => \$$para{rev},
+    'complement|c'         => \$$para{comp},
+    'reversecomplement|rc' => \$$para{rc},
+    'trim|t'               => \$$para{trim},
+    'lowercase|lc'         => \$$para{lc},
+    'uppercase|uc'         => \$$para{uc},
+) or die $usage;
+
+die $usage if $$para{help};
 
 # get the file list
 my @files = ();
@@ -41,6 +68,27 @@ for my $file (@files) {
         my ( $header, $seq ) = @$fa;
 
         $header =~ s/\t/__tab__/g;
+
+        if ( $$para{trim} ) {
+            $seq =~ s/[^a-zA-Z]+//g;
+        }
+
+        if ( $$para{rc} ) {
+            $seq = revcom($seq);
+        }
+        elsif ( $$para{comp} ) {
+            $seq = complement($seq);
+        }
+        elsif ( $$para{rev} ) {
+            $seq = reverse $seq;
+        }
+
+        if ( $$para{lc} ) {
+            $seq = lc $seq;
+        }
+        elsif ( $$para{uc} ) {
+            $seq = uc $seq;
+        }
 
         print "$header\t$seq\n";
     }
