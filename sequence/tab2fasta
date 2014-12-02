@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # https://github.com/shenwei356/bio_scripts
-# 
+#
 # tab2fasta - transfrom column table to fasta fromat
-# 
+#
 # This script is usually used in pair with fasta2tab.
 #
 
@@ -25,21 +25,22 @@ for my $file (@files) {
 
     if ( $file eq 'STDIN' ) {
         $fh = *STDIN;
-    } else{
-        open $fh, "<", $file 
+    }
+    else {
+        open $fh, "<", $file
             or die "fail to open file: $file\n";
     }
 
-    my ($header, $seq) = ("", "");
-    while(<$fh>) {
+    my ( $header, $seq ) = ( "", "" );
+    while (<$fh>) {
         s/\r?\n//g;
         s/^\s+|\s+$//g;
         next if $_ eq ''    # blank line
             or /^#/;        # annotation
 
-        # first column as header, and second column as sequence, 
+        # first column as header, and second column as sequence,
         # ignore others
-        ($header, $seq) = split /\t/, $_;
+        ( $header, $seq ) = split /\t/, $_;
 
         $header =~ s/__tab__/\t/g;
 

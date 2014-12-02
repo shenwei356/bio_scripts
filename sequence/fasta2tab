@@ -1,11 +1,12 @@
 #!/usr/bin/env perl
 # https://github.com/shenwei356/bio_scripts
-# 
-# fasta2tab - transfrom the fasta fromat to two-column table 
-# 
+#
+# fasta2tab - transfrom the fasta fromat to two-column table
+#
 # This script is usually used in pair with tab2fasta.
-# 
-# Example:
+#
+# Examples:
+#
 #    1. sort fasta by sequnece length
 #
 #       cat seq.fa \
@@ -14,6 +15,10 @@
 #         | sort -k3,3 \
 #         | tab2fasta \
 #         > seq.sorted.fa
+#
+#   2. extract sequence longer than 1000 bp
+#
+#       fasta2tab seq.fa | awk -F'\t' 'length $2 >= 1000' | tab2fasta
 #
 
 use strict;
