@@ -32,6 +32,8 @@ Examples:
     2. extract sequence longer than 1000 bp
        fasta2tab seq.fa | awk -F'\t' 'length $2 >= 1000' | tab2fasta
 
+    3. reverse complement sequence, uppercase, and trim gaps
+       zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
 
 This script is usually used in pair with tab2fasta.
 https://github.com/shenwei356/bio_scripts
