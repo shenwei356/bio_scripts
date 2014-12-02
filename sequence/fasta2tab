@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
+# 
+# fasta2tab - transfrom the fasta fromat to two-column table 
+# 
+# This script is usually used in pair with tab2fasta.
+# 
+# Example:
+#    1. sort fasta by sequnece length
+#
+#       cat seq.fa \
+#         | fasta2tab  \
+#         | awk -F"\t" ' {printf "%s\t%s\t%d\n", $1, $2 ,length($2) } ' \
+#         | sort -k3,3 \
+#         | tab2fasta \
+#         > seq.sorted.fa
+#
+
+use strict;
+use BioUtil::Seq;
+
+# get the file list
+my @files = ();
+for my $file (@ARGV) {
+    for my $f ( glob $file ) {
+        push @files, $f;
+    }
+}
+if ( @files == 0 ) {
+    push @files, 'STDIN';
+}
+
+for my $file (@files) {
+    my $next_seq = FastaReader($file);
+    while ( my $fa = &$next_seq() ) {
+        my ( $header, $seq ) = @$fa;
+
+        $header =~ s/\t/__tab__/g;
+
+        print "$header\t$seq\n";
+    }
+}
