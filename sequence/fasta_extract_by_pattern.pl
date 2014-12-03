@@ -17,7 +17,7 @@ Usage: $0 [options] [fastafiles...]
 Options:
     
     -p,  --pattern STRING      Search pattern
-    -pf, --patternfile FILE    Pattern list file
+    -pf, --patternfile FILE    Pattern list file (use first column)
     -r,  --useregexp           Use regular expression, case ignored
     -n,  --not                 Extract sequences NOT match the pattern
     -s,  --byseq               Match by sequence 
@@ -54,7 +54,7 @@ die $usage if $$para{help};
 # get patterns
 my @patterns = ();
 push @patterns, $$para{pattern} if $$para{pattern};
-push @patterns, @{ get_list_from_file( $$para{patternfile} ) }
+push @patterns, @{ get_column_data( $$para{patternfile}, 1 ) }
     if $$para{patternfile};
 die "no patterns given. Type \"$0 -h\" for help.\n" if @patterns == 0;
 

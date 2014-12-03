@@ -10,8 +10,7 @@ my $usage = q(
 fasta2tab - transfrom the fasta fromat to two-column table
 
 Usage: $0 [options] [fastafiles...]
-Options:
-    
+Options:    
     -r,  --reverse             Reverse sequence
     -c,  --complement          Complement sequence
     -rc, --reversecomplement   Reversecomplement
