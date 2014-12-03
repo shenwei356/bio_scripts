@@ -1,13 +1,32 @@
 #!/usr/bin/env perl
 # https://github.com/shenwei356/bio_scripts
-#
-# tab2fasta - transfrom column table to fasta fromat
-#
-# This script is usually used in pair with fasta2tab.
-#
 
 use strict;
+use Getopt::Long;
 use BioUtil::Seq;
+
+my $usage = q(
+tab2fasta - transfrom column table to fasta fromat
+
+Usage: $0 [options] [tablefile...]
+
+Options:
+    
+    -l,  --linelength          Linelength
+    -h,  --help                Show this help information
+
+This script is usually used in pair with fasta2tab.
+https://github.com/shenwei356/bio_scripts
+
+);
+
+my $para = {};
+GetOptions(
+    'help|h'         => \$$para{help},
+    'linelength|l=i' => \$$para{linelength},
+) or die $usage;
+
+die $usage if $$para{help};
 
 # get the file list
 my @files = ();
@@ -23,8 +42,10 @@ if ( @files == 0 ) {
 for my $file (@files) {
     my $fh = undef;
 
+    my $is_stdin = 0;
     if ( $file eq 'STDIN' ) {
-        $fh = *STDIN;
+        $fh       = *STDIN;
+        $is_stdin = 1;
     }
     else {
         open $fh, "<", $file
@@ -44,6 +65,13 @@ for my $file (@files) {
 
         $header =~ s/__tab__/\t/g;
 
-        print ">$header\n$seq\n";
+        if ( $$para{linelength} ) {
+            print ">$header\n", format_seq( $seq, $$para{linelength} );
+        }
+        else {
+            print ">$header\n$seq\n";
+        }
     }
+
+    close $fh unless $is_stdin;
 }
