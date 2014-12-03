@@ -59,15 +59,7 @@ push @patterns, @{ get_list_from_file( $$para{patternfile} ) }
 die "no patterns given. Type \"$0 -h\" for help.\n" if @patterns == 0;
 
 # get the file list
-my @files = ();
-for my $file (@ARGV) {
-    for my $f ( glob $file ) {
-        push @files, $f;
-    }
-}
-if ( @files == 0 ) {
-    push @files, 'STDIN';
-}
+my @files = file_list_from_argv(@ARGV);
 
 # patterns_map for rapid matching with full pattern
 my %patterns_map = ();

@@ -7,15 +7,7 @@
 # Update  : 2014-07-29
 
 use strict;
-
-# try to use BioUtil::Seq
-if ( eval { require BioUtil::Seq; 1; } ne 1 ) {
-    die "\nPlease install BioUtil::Seq by CPAN:\n"
-        . "  cpan install BioUtil\n\n";
-}
-else {
-    BioUtil::Seq->import();
-}
+use BioUtil::Seq;
 
 my $usage = <<"USAGE";
 

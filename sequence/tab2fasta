@@ -3,7 +3,7 @@
 
 use strict;
 use Getopt::Long;
-use BioUtil::Seq;
+use BioUtil::Util;
 
 my $usage = q(
 tab2fasta - transfrom column table to fasta fromat
@@ -28,16 +28,7 @@ GetOptions(
 
 die $usage if $$para{help};
 
-# get the file list
-my @files = ();
-for my $file (@ARGV) {
-    for my $f ( glob $file ) {
-        push @files, $f;
-    }
-}
-if ( @files == 0 ) {
-    push @files, 'STDIN';
-}
+my @files = file_list_from_argv(@ARGV);
 
 for my $file (@files) {
     my $fh = undef;

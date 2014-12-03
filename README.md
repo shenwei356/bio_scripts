@@ -7,7 +7,7 @@ See more utilitis in BioUtil module from [CPAN](http://search.cpan.org/search?qu
 
 -------
 
-Copyright (c) 2013, Wei Shen (shenwei356@gmail.com)
+Copyright (c) 2014, Wei Shen (shenwei356@gmail.com)
 
 
 [MIT License](https://github.com/shenwei356/bio_scripts/blob/master/LICENSE)

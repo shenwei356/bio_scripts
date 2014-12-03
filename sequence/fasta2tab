@@ -4,6 +4,7 @@
 use strict;
 use Getopt::Long;
 use BioUtil::Seq;
+use BioUtil::Util;
 
 my $usage = q(
 fasta2tab - transfrom the fasta fromat to two-column table
@@ -19,8 +20,10 @@ Options:
     -lc, --lowercase           Lowercase
     -uc, --uppercase           Uppercase
 
-    -l,  --length              Ouput sequence length in another column
-    -gc, --gc                  Ouput GC content in another column
+    -l,  --length              Ouput sequence length at another column
+    -l2, --length2             Ouput number of latin-letter in sequence 
+                               at another column
+    -gc, --gc                  Ouput GC content at another column
 
     -h,  --help                Show this help information
 
@@ -33,7 +36,10 @@ Examples:
     2. extract sequence longer than 1000 bp
        cat seq.fa | fasta2tab -t -l | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
 
-    3. reverse complement sequence, uppercase, and trim gaps
+    3. extract aligned sequence of which the original sequence is longer than 1000 bp
+       cat seq.fa | fasta2tab   -l2 | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
+
+    4. reverse complement sequence, uppercase, and trim gaps
        zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
 
 This script is usually used in pair with tab2fasta.
@@ -53,23 +59,15 @@ GetOptions(
     'lowercase|lc' => \$$para{lc},
     'uppercase|uc' => \$$para{uc},
 
-    'length|l' => \$$para{len},
-    'gc'       => \$$para{gc},
+    'length|l'   => \$$para{len},
+    'length2|l2' => \$$para{len2},
+    'gc'         => \$$para{gc},
 
 ) or die $usage;
 
 die $usage if $$para{help};
 
-# get the file list
-my @files = ();
-for my $file (@ARGV) {
-    for my $f ( glob $file ) {
-        push @files, $f;
-    }
-}
-if ( @files == 0 ) {
-    push @files, 'STDIN';
-}
+my @files = file_list_from_argv(@ARGV);
 
 for my $file (@files) {
     my $next_seq = FastaReader($file);
@@ -101,6 +99,15 @@ for my $file (@files) {
 
         print "$header\t$seq";
         print "\t", length $seq if $$para{len};
+        if ($$para{len2}){
+            if ($$para{trim}){
+                print "\t", length $seq;
+            } else {
+                my $seq2 = $seq;
+                $seq2 =~ s/[^a-zA-Z]+//g;
+                print "\t", length $seq2;
+            }
+        }
         print "\t", base_content( 'gc', $seq ) if $$para{gc};
         print "\n";
     }

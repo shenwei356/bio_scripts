@@ -5,6 +5,7 @@ use strict;
 
 use File::Basename;
 use BioUtil::Seq;
+use BioUtil::Util;
 
 $0 = basename($0);
 my $usage = <<USAGE;
@@ -31,16 +32,7 @@ die "Probability should between 0 and 1\n"
 
 srand();
 
-my @files = ();
-
-for my $file (@ARGV) {
-    for my $f ( glob $file ) {
-        push @files, $f;
-    }
-}
-if ( @files == 0 ) {
-    push @files, 'STDIN';
-}
+my @files = file_list_from_argv(@ARGV);
 
 my $n = 0;
 for my $file (@files) {
