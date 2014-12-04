@@ -76,7 +76,7 @@ for my $file (@files) {
     while ( my $fa = &$next_seq() ) {
         ( $header, $seq ) = @$fa;
         $sum++;
-        print STDERR "\rsum: $sum";
+        print STDERR "\rcount: $sum";
         if ($do_once) {
             $len = length $seq;
             $$gaploc{$_} = 1 for 0 .. ( $len - 1 );
@@ -93,7 +93,7 @@ for my $file (@files) {
         if ( scalar keys %$gaploc == 0 ) {
             close $tmp_file_fh if $use_stdin;
             remove_tmpfile()   if $use_stdin;
-            die "no gap to trim\n";
+            die "\nno gap to trim\n";
         }
 
         print $tmp_file_fh ">$header\n$seq\n" if $use_stdin;
@@ -102,12 +102,13 @@ for my $file (@files) {
 
 close $tmp_file_fh if $use_stdin;
 
-print STDERR scalar keys %$gaploc, " gaps to trim\n";
+my @index = keys %$gaploc;
+
+print STDERR "\n", (scalar @index), " gaps to trim\n";
 print STDERR "\nextract sequences...\n";
 
 @files = ($tmp_file) if $use_stdin;
 
-my @index = keys %$gaploc;
 for my $file (@files) {
     my $next_seq = FastaReader($file);
     while ( my $fa = &$next_seq() ) {
