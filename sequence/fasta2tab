@@ -7,7 +7,7 @@ use BioUtil::Seq;
 use BioUtil::Util;
 
 my $usage = q(
-fasta2tab - transfrom the fasta fromat to two-column table
+fasta2tab - transform the fasta fromat to two-column table
 
 Usage: $0 [options] [fastafiles...]
 Options:    

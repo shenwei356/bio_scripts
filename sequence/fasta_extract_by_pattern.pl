@@ -11,7 +11,7 @@ use BioUtil::Util;
 $0 = basename($0);
 my $usage = <<USAGE;
 
-Extract fasta sequences by header (list file) or regular express (list file)
+Extract fasta sequences by header (list file) or regular expression (list file)
 
 Usage: $0 [options] [fastafiles...]
 Options:
@@ -31,7 +31,7 @@ Examples:
         $0 -r -n -p Bacteria seq1.fa seq2.fa > result.fa
     3) sequences with TTSAA (AgsI digest site) in SEQUENCE. 
        Base S stands for C or G.
-        $0 -r -s -p TT[C|G]AA seq.fa > result.fa
+        $0 -r -s -p 'TT[C|G]AA' seq.fa > result.fa
     4) sequences (read from STDIN ) with header that matches any patterns
        in list file
         zcat seq.fa.gz | $0 -pf name_list.txt > result.fa
