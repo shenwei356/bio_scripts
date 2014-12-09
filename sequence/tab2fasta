@@ -4,6 +4,7 @@
 use strict;
 use Getopt::Long;
 use BioUtil::Util;
+use BioUtil::Seq;
 
 my $usage = q(
 tab2fasta - transfrom column table to fasta fromat
