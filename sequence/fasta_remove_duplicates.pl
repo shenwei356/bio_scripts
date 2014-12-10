@@ -2,14 +2,13 @@
 # https://github.com/shenwei356/bio_scripts
 
 use strict;
-
-use strict;
 use File::Basename;
 use Getopt::Long;
 use Digest::MD5 'md5_hex';
 use BioUtil::Seq;
 use BioUtil::Util;
 
+local $| = 1;
 $0 = basename($0);
 my $usage = <<USAGE;
 
