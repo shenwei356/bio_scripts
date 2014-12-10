@@ -8,6 +8,7 @@ use Getopt::Long;
 use Digest::MD5 'md5_hex';
 use BioUtil::Seq;
 
+local $| = 1;
 $0 = basename($0);
 my $usage = <<"USAGE";
 ===============================================================================
@@ -49,10 +50,12 @@ my $names  = {};
 my ( $file, $next_seq, $head, $head0, $seq, $seq_md5 );
 
 for $file (@ARGV) {
+    print STDERR "\nparsing $file...\n";
+    my $n = 0;
     $next_seq = FastaReader($file);
     while ( my $fa = &$next_seq() ) {
         ( $head, $seq ) = @$fa;
-
+        print STDERR "\r", ++$n;
         $head0 = $head;                     # orgin sequence name
         $head = lc $head if $ignore_case;
 
@@ -74,6 +77,7 @@ for $file (@ARGV) {
 }
 
 # output common sequences
+print STDERR "\nchecking...\n";
 my $file_num = scalar @ARGV;
 $file = $ARGV[0];    # extract sequences from the first file.
 my $names_ok = {};
@@ -86,14 +90,18 @@ for my $key ( keys %$counts ) {
         = $$counts{$key}{$file};    # save to a hash.
 }
 
+print STDERR "extracting...\n";
+my $n = 0;
 $next_seq = FastaReader($file);
 while ( my $fa = &$next_seq() ) {
     ( $head, $seq ) = @$fa;
 
     if ( exists $$names_ok{$head} and $$names_ok{$head} > 0 ) {
+        print STDERR "\rhit: ", ++$n;
         print ">$head\n$seq\n";
 
         # just export one record for duplicated records.
         $$names_ok{$head} = 0;
     }
 }
+print STDERR "\n";
