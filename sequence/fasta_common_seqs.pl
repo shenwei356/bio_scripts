@@ -28,17 +28,20 @@ Site    : https://github.com/shenwei356/bio_scripts
 
 Usage   : $0 [-s] [-i] fastafile fastafile2 [fastafile3 ...]
 Options :
-   -s Comparing by sequence.
-   -i Ignore case.
+   -s   Comparing by sequence.
+   -i   Ignore case.
+   -l   Output line length. [70]
 ===============================================================================
 
 USAGE
 
 my $by_seq      = 0;
 my $ignore_case = 0;
+my $linelength  = 70;
 GetOptions(
-    "s" => \$by_seq,
-    "i" => \$ignore_case,
+    "s"   => \$by_seq,
+    "i"   => \$ignore_case,
+    'l=i' => \$linelength,
 ) or die $usage;
 
 # at least two files;
@@ -98,7 +101,7 @@ while ( my $fa = &$next_seq() ) {
 
     if ( exists $$names_ok{$head} and $$names_ok{$head} > 0 ) {
         print STDERR "\rhit: ", ++$n;
-        print ">$head\n$seq\n";
+        print ">$head\n", format_seq( $seq, $linelength );
 
         # just export one record for duplicated records.
         $$names_ok{$head} = 0;
