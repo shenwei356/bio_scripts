@@ -2,5 +2,5 @@
 use strict;
 
 my $seq = shift @ARGV;
-$seq =~ tr/ACGTRYMKSWBDHVNacgtrymkswbdhvn/TGCAYRKMWSVHDBNtgcayrkmwsvhdbn/;
+$seq =~ tr/ACGTRYMKSWBDHVNacgtrymkswbdhvn/TGCAYRKMSWVHDBNtgcayrkmswvhdbn/;
 print "$seq\n";

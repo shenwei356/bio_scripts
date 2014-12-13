@@ -3,5 +3,5 @@ use strict;
 
 my $seq = shift @ARGV;
 $seq = reverse $seq;
-$seq =~ tr/ACGTRYMKSWBDHVNacgtrymkswbdhvn/TGCAYRKMWSVHDBNtgcayrkmwsvhdbn/;
+$seq =~ tr/ACGTRYMKSWBDHVNacgtrymkswbdhvn/TGCAYRKMSWVHDBNtgcayrkmswvhdbn/;
 print "$seq\n";
