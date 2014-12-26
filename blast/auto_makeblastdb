@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
+
+use strict;
+use BioUtil::Seq;
+use BioUtil::Util;
+
+my $usage = q(
+auto_makeblastdb -- just for typing fewer words..^_^
+
+Usage: $0 [arguments]
+Options:    
+    -in                  
+    -input_type          [fasta]
+
+    -dbtype              [nucl]
+    -out
+    -title               
+
+    -parse_seqids        [1]
+
+    -mask                [0]
+
+    -h                   Show this help information
+
+Examples:
+
+    auto_makeblastdb -in ab.fa -out ab
+
+https://github.com/shenwei356/bio_scripts
+
+);
+
+my $opts = {};
+$$opts{-input_type} = 'fasta';
+$$opts{-dbtype}     = 'nucl';
+
+getopt( $opts, \@ARGV );
+
+die $usage unless exists $$opts{-in} and exists $$opts{-out};
+$$opts{-title} = $$opts{-out} unless exists $$opts{-title};
+
+my $cmd = '';
+my ( $file_mask_asnb, $file_mask_counts ) = (undef) x 2;
+if ( $$opts{-mask} ) {
+    print STDERR "Create masking information using windowmask...\n";
+    $file_mask_counts = "$$opts{-out}_mask.counts";
+    $file_mask_asnb   = "$$opts{-out}_mask.asnb";
+    $cmd
+        = sprintf
+        "windowmasker -in %s -infmt %s -mk_counts -parse_seqids -out %s",
+        $$opts{-in}, $$opts{-input_type}, $file_mask_counts;
+    run($cmd);
+
+    print STDERR "Makeblastdb...\n";
+    $cmd
+        = sprintf
+        "windowmasker -in %s -infmt %s -ustat %s -outfmt %s -parse_seqids -out %s",
+        $$opts{-in}, $$opts{-input_type}, $file_mask_counts,
+        "maskinfo_asn1_bin", $file_mask_asnb;
+    run($cmd);
+}
+
+$cmd
+    = sprintf
+    "makeblastdb -in %s -input_type %s -dbtype %s -parse_seqids -out %s -title %s",
+    $$opts{-in}, $$opts{-input_type}, $$opts{-dbtype},
+    $$opts{-out}, $$opts{-title};
+
+if ( $$opts{-mask} ) {
+    $cmd .= " -mask_data $file_mask_asnb";
+}
+
+run($cmd);

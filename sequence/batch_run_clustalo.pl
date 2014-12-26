@@ -20,5 +20,6 @@ my $threads = shift @ARGV;
 for my $file (@ARGV) {
     my $fileout = "$file.align.fa";
     my $cmd     = "clustalo -i $file -o $fileout --force --outfmt fasta --threads=$threads";
-    run($cmd);
+    my $fail = run($cmd);
+    die "failed to run:$cmd\n" if $fail;
 }

@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
+
+use strict;
+use BioUtil::Seq;
+use BioUtil::Util;
+
+my $usage = q(
+auto_blast -- just for typing fewer words..^_^
+
+Usage: $0 [arguments]
+Options:   
+    -program             [blastn] 
+    -query
+    -db               
+    -outfmt              [11 0]
+
+    -h                   Show this help information
+
+Examples:
+
+    auto_blast -query test.fa -db nt -outfmt 6
+
+https://github.com/shenwei356/bio_scripts
+
+);
+
+my $opts = {};
+$$opts{-program}     = 'blastn';
+$$opts{-num_threads} = `cat /proc/cpuinfo | grep processor |wc -l`;
+$$opts{-num_threads} =~ s/\n//g;
+my $outfmt7shenwei356
+    = '7 qseqid sseqid qlen length pident ppos qcovs qcovhsp'
+    . ' mismatch gapopen gaps sstrand qstart qend sstart send'
+    . ' evalue bitscore staxids salltitles';
+$$opts{-outfmt} = [ 0, $outfmt7shenwei356 ];
+
+getopt( $opts, \@ARGV );
+
+# print "$_: $$opts{$_}\n" for sort keys %$opts;
+
+die $usage unless exists $$opts{-query} and exists $$opts{-db};
+die "file not exists: $$opts{-query}\n" unless -e $$opts{-query};
+
+my $info = sprintf "%s.%s@%s", $$opts{-query}, $$opts{-program}, $$opts{-db};
+$$opts{-out} = $info unless exists $$opts{-out};
+
+my $cmd = "";
+
+$cmd = $$opts{-program};
+for ( sort keys %$opts ) {
+    next if $_ eq '-program' or $_ eq '-outfmt' or $_ eq '-out';
+
+    if ( ref $$opts{$_} eq ref [] ) {
+        $cmd .= " $_ ", join " ", @{ $$opts{$_} };
+    }
+    else {
+        $cmd .= " $_ $$opts{$_}";
+    }
+}
+my $file_outfmt11 = "$$opts{-out}.asn";
+$cmd .= " -outfmt 11 -out $file_outfmt11";
+
+print STDERR "$cmd\n";
+my $fail = run($cmd);
+die "failed to run:$cmd\n" if $fail;
+
+for ( @{ $$opts{-outfmt} } ) {
+    s/^\s+//g;
+    my $outfmt = ( split( /\s+/, $_ ) )[0];
+    $cmd
+        = "blast_formatter -archive $file_outfmt11 -outfmt \"$_\" > $$opts{-out}.outfmt$outfmt";
+    print STDERR "$cmd\n";
+    my $fail = run($cmd);
+    die "failed to run:$cmd\n" if $fail;
+}
