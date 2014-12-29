@@ -42,14 +42,19 @@ getopt( $opts, \@ARGV );
 die $usage unless exists $$opts{-query} and exists $$opts{-db};
 die "file not exists: $$opts{-query}\n" unless -e $$opts{-query};
 
-my $info = sprintf "%s.%s@%s", $$opts{-query}, $$opts{-program}, $$opts{-db};
+my $info = sprintf "%s.%s@%s", quotemeta $$opts{-query}, $$opts{-program},
+    $$opts{-db};
 $$opts{-out} = $info unless exists $$opts{-out};
 
 my $cmd = "";
 
 $cmd = $$opts{-program};
 for ( sort keys %$opts ) {
-    next if $_ eq '-program' or $_ eq '-outfmt' or $_ eq '-out';
+    next
+        if $_ eq '-program'
+        or $_ eq '-outfmt'
+        or $_ eq '-out'
+        or $_ eq '-query';
 
     if ( ref $$opts{$_} eq ref [] ) {
         $cmd .= " $_ ", join " ", @{ $$opts{$_} };
@@ -59,7 +64,8 @@ for ( sort keys %$opts ) {
     }
 }
 my $file_outfmt11 = "$$opts{-out}.asn";
-$cmd .= " -outfmt 11 -out $file_outfmt11";
+$cmd .= sprintf " -query %s -outfmt 11 -out %s",
+    quotemeta $$opts{-query}, $file_outfmt11;
 
 print STDERR "$cmd\n";
 my $fail = run($cmd);

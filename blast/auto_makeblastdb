@@ -38,6 +38,8 @@ $$opts{-dbtype}     = 'nucl';
 getopt( $opts, \@ARGV );
 
 die $usage unless exists $$opts{-in} and exists $$opts{-out};
+die "file not exists: $$opts{-in}\n" unless -e $$opts{-in};
+
 $$opts{-title} = $$opts{-out} unless exists $$opts{-title};
 
 my $cmd = '';
@@ -49,26 +51,29 @@ if ( $$opts{-mask} ) {
     $cmd
         = sprintf
         "windowmasker -in %s -infmt %s -mk_counts -parse_seqids -out %s",
-        $$opts{-in}, $$opts{-input_type}, $file_mask_counts;
-    run($cmd);
+        quotemeta $$opts{-in}, $$opts{-input_type}, $file_mask_counts;
+    my $fail = run($cmd);
+    die "failed to run:$cmd\n" if $fail;
 
     print STDERR "Makeblastdb...\n";
     $cmd
         = sprintf
         "windowmasker -in %s -infmt %s -ustat %s -outfmt %s -parse_seqids -out %s",
-        $$opts{-in}, $$opts{-input_type}, $file_mask_counts,
+        quotemeta $$opts{-in}, $$opts{-input_type}, $file_mask_counts,
         "maskinfo_asn1_bin", $file_mask_asnb;
-    run($cmd);
+    my $fail = run($cmd);
+    die "failed to run:$cmd\n" if $fail;
 }
 
 $cmd
     = sprintf
     "makeblastdb -in %s -input_type %s -dbtype %s -parse_seqids -out %s -title %s",
-    $$opts{-in}, $$opts{-input_type}, $$opts{-dbtype},
+    quotemeta $$opts{-in}, $$opts{-input_type}, $$opts{-dbtype},
     $$opts{-out}, $$opts{-title};
 
 if ( $$opts{-mask} ) {
     $cmd .= " -mask_data $file_mask_asnb";
 }
 
-run($cmd);
+my $fail = run($cmd);
+die "failed to run:$cmd\n" if $fail;
