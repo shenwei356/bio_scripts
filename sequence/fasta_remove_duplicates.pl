@@ -27,7 +27,7 @@ Options:
 Examples:
     
     fasta_remove_duplicates.pl -s -i seq1.fa seq2.fa > uniq.fa
-    fasta_remove_duplicates.pl seq*.fa > uniq.fa
+    fasta_remove_duplicates.pl -n seq*.fa > uniq.fa
     zcat seq.fa.gz | fasta_remove_duplicates.pl -s -i > uniq.fa
 
     # remove records same header and seqs
@@ -38,7 +38,7 @@ https://github.com/shenwei356/bio_scripts
 USAGE
 
 my $help        = 0;
-my $by_head     = 1;
+my $by_head     = 0;
 my $by_seq      = 0;
 my $ignore_case = 0;
 my $linelength  = 70;
@@ -65,14 +65,12 @@ for $file (@files) {
 
         if ($by_seq) {    # comparing by seq
             $target = $seq;
-        }
-        elsif ($by_head) {    # comparing by head
-            if ($by_seq) {    # comparing by head and seq
+            if ($by_head) {    # comparing by head and seq
                 $target = $header . $seq;
             }
-            else {
-                $target = $header;
-            }
+        }
+        elsif ($by_head) {     # comparing by head
+            $target = $header;
         }
 
         $target = lc $target if $ignore_case;
