@@ -17,9 +17,12 @@ Remove duplicated fasta records
 Usage: $0 [options] [fastafiles...]
 Options:
     
+   -n   Comparing by header.
    -s   Comparing by sequence.
    -i   Ignore case.
    -l   Output line length. [70]
+
+   -h   Show this help information.
 
 Examples:
     
@@ -27,18 +30,27 @@ Examples:
     fasta_remove_duplicates.pl seq*.fa > uniq.fa
     zcat seq.fa.gz | fasta_remove_duplicates.pl -s -i > uniq.fa
 
+    # remove records same header and seqs
+    fasta_remove_duplicates.pl -s -n -i seq1.fa > uniq.fa
+
 https://github.com/shenwei356/bio_scripts
 
 USAGE
 
+my $help        = 0;
+my $by_head     = 1;
 my $by_seq      = 0;
 my $ignore_case = 0;
 my $linelength  = 70;
 GetOptions(
-    "s"   => \$by_seq,
-    "i"   => \$ignore_case,
-    'l=i' => \$linelength,
+    'help|h' => \$help,
+    "n"      => \$by_head,
+    "s"      => \$by_seq,
+    "i"      => \$ignore_case,
+    'l=i'    => \$linelength,
 ) or die $usage;
+
+die $usage if $help;
 
 # get the file list
 my @files = file_list_from_argv(@ARGV);
@@ -51,12 +63,22 @@ for $file (@files) {
     while ( $fa = &$next_seq() ) {
         ( $header, $seq ) = @$fa;
 
-        $target = $header;
-        $target = $seq if $by_seq;              # comparing by seq
-        $target = lc $target if $ignore_case;
-        $md5    = md5_hex($target);
+        if ($by_seq) {    # comparing by seq
+            $target = $seq;
+        }
+        elsif ($by_head) {    # comparing by head
+            if ($by_seq) {    # comparing by head and seq
+                $target = $header . $seq;
+            }
+            else {
+                $target = $header;
+            }
+        }
 
-        if ( $$md5s{$md5} == 1 ) {              # duplicates
+        $target = lc $target if $ignore_case;
+        $md5 = md5_hex($target);
+
+        if ( $$md5s{$md5} == 1 ) {    # duplicates
             $n++;
         }
         else {

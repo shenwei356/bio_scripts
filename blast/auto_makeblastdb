@@ -2,6 +2,7 @@
 # https://github.com/shenwei356/bio_scripts
 
 use strict;
+use File::Basename;
 use BioUtil::Seq;
 use BioUtil::Util;
 

@@ -2,6 +2,7 @@
 # https://github.com/shenwei356/bio_scripts
 
 use strict;
+use File::Basename;
 use BioUtil::Seq;
 use BioUtil::Util;
 
@@ -43,7 +44,7 @@ die $usage unless exists $$opts{-query} and exists $$opts{-db};
 die "file not exists: $$opts{-query}\n" unless -e $$opts{-query};
 
 my $info = sprintf "%s.%s@%s", quotemeta $$opts{-query}, $$opts{-program},
-    $$opts{-db};
+    basename($$opts{-db});
 $$opts{-out} = $info unless exists $$opts{-out};
 
 my $cmd = "";
