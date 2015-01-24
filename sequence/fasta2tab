@@ -11,20 +11,26 @@ fasta2tab - transform the fasta fromat to two-column table
 
 Usage: $0 [options] [fastafiles...]
 Options:    
-    -r,  --reverse             Reverse sequence
-    -c,  --complement          Complement sequence
-    -rc, --reversecomplement   Reversecomplement
+    -r,   --reverse             Reverse sequence
+    -c,   --complement          Complement sequence
+    -rc,  --reversecomplement   Reversecomplement
+    -sub, --subseq  INT,INT     Substring of sequence
+                                Examples:
+                                    -sub 5,10   5th to 10th bases
+                                    -sub  ,10   1th to 10th bases
+                                    -sub 2,     2nd to the end
+                                    -sub -2,    last 2 bases
 
-    -t,  --trim                Trim non-Latin alphabet
-    -lc, --lowercase           Lowercase
-    -uc, --uppercase           Uppercase
+    -t,   --trim                Trim non-Latin alphabet
+    -lc,  --lowercase           Lowercase
+    -uc,  --uppercase           Uppercase
 
-    -l,  --length              Ouput sequence length at another column
-    -l2, --length2             Ouput number of latin-letter in sequence 
+    -l,   --length              Ouput sequence length at another column
+    -l2,  --length2             Ouput number of latin-letter in sequence 
                                at another column
-    -gc, --gc                  Ouput GC content at another column
+    -gc,  --gc                  Ouput GC content at another column
 
-    -h,  --help                Show this help information
+    -h,   --help                Show this help information
 
 Examples:
 
@@ -53,6 +59,7 @@ GetOptions(
     'reverse|r'            => \$$para{rev},
     'complement|c'         => \$$para{comp},
     'reversecomplement|rc' => \$$para{rc},
+    'subseq|sub=s'         => \$$para{sub},
 
     'trim|t'       => \$$para{trim},
     'lowercase|lc' => \$$para{lc},
@@ -65,6 +72,17 @@ GetOptions(
 ) or die $usage;
 
 die $usage if $$para{help};
+if ( $$para{sub} ) {
+    die qq(
+parameter of -sub not correct.
+examples:
+    -sub 5,10   5th to 10th bases
+    -sub  ,10   1th to 10th bases
+    -sub 2,     2nd to the end
+    -sub -2,    last 2 bases
+
+) unless $$para{sub} =~ /^-?\d*,-?\d*$/;
+}
 
 my @files = file_list_from_argv(@ARGV);
 
@@ -79,14 +97,30 @@ for my $file (@files) {
             $seq =~ s/[^a-zA-Z]+//g;
         }
 
+        if ( $$para{sub} ) {
+            my ( $start, $end ) = split /,/, $$para{sub};
+            if ( $start eq '' ) {
+                $start = 1;
+            }
+            elsif ( $start < 0 ) {
+                $start += 1;
+            }
+
+            if ( $end eq '' ) {
+                $end = 1 + length $seq;
+            }
+            elsif ( $end < 0 ) {
+                $end += 1;
+            }
+            $seq = substr $seq, $start - 1, $end;
+        }
+
         if ( $$para{rc} ) {
             $seq = revcom($seq);
         }
-        elsif ( $$para{comp} ) {
-            $seq = complement($seq);
-        }
-        elsif ( $$para{rev} ) {
-            $seq = reverse $seq;
+        else {
+            $seq = complement($seq) if $$para{comp};
+            $seq = reverse $seq     if $$para{rev};
         }
 
         if ( $$para{lc} ) {
@@ -98,10 +132,11 @@ for my $file (@files) {
 
         print "$header\t$seq";
         print "\t", length $seq if $$para{len};
-        if ($$para{len2}){
-            if ($$para{trim}){
+        if ( $$para{len2} ) {
+            if ( $$para{trim} ) {
                 print "\t", length $seq;
-            } else {
+            }
+            else {
                 my $seq2 = $seq;
                 $seq2 =~ s/[^a-zA-Z]+//g;
                 print "\t", length $seq2;
