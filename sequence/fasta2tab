@@ -38,13 +38,16 @@ Examples:
        cat seq.fa | fasta2tab -t -l | sort -r -t"`echo -e '\t'`" -n -k3,3 \
          |  tab2fasta -l 70 > seq.sorted.fa
 
-    2. extract sequence longer than 1000 bp
+    2. extract sub sequence
+       fasta2tab -t -sub 3,10 -rc  seq.fa | tab2fasta
+
+    3. extract sequence longer than 1000 bp
        cat seq.fa | fasta2tab -t -l | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
 
-    3. extract aligned sequence of which the original sequence is longer than 1000 bp
+    4. extract aligned sequence of which the original sequence is longer than 1000 bp
        cat seq.fa | fasta2tab   -l2 | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
 
-    4. reverse complement sequence, uppercase, and trim gaps
+    5. reverse complement sequence, uppercase, and trim gaps
        zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
 
 This script is usually used in pair with tab2fasta.
