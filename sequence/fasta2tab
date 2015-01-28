@@ -14,7 +14,7 @@ Options:
     -r,   --reverse             Reverse sequence
     -c,   --complement          Complement sequence
     -rc,  --reversecomplement   Reversecomplement
-    -sub, --subseq  INT,INT     Substring of sequence
+    -sub, --subseq  INT,INT     Substring of sequence, 1-based
                                 Examples:
                                     seq         ACGAGACGTA
                                     index       1234567890
