@@ -8,32 +8,32 @@
 
 #### Examples
 
-##### sort fasta by sequnece length
+##### 1. sort fasta by sequnece length
 
 ```
 cat seq.fa | fasta2tab -t -l | sort -r -t"`echo -e '\t'`" -n -k3,3 \
 | tab2fasta -l 70 > seq.sorted.fa
 ```
 
-##### extract sub sequence
+##### 2. extract sub sequence
 
 ```
 fasta2tab -t -sub 3,10 -rc seq.fa | tab2fasta
 ```
 
-#####  extract sequence longer than 1000 bp
+##### 3. extract sequence longer than 1000 bp
 
 ```
 cat seq.fa | fasta2tab -t -l | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
 ```
 
-##### extract aligned sequence of which the original sequence is longer than 1000 bp
+##### 4. extract aligned sequence of which the original sequence is longer than 1000 bp
 
 ```
 cat seq.fa | fasta2tab -l2 | awk -F'\t' '$3 >= 1000' | tab2fasta -l 70
 ```
 
-##### reverse complement sequence, uppercase, and trim gaps
+##### 5. reverse complement sequence, uppercase, and trim gaps
 
 ```
 zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
@@ -45,25 +45,25 @@ zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
 
 #### Examples
 
-##### sequences WITH "bacteria" in header
+##### 1. sequences WITH "bacteria" in header
 
 ```
 fasta_extract_by_pattern.pl -r -p Bacteria *.fa > result.fa
 ```
 
-##### sequences WITHOUT “bacteria” in header
+##### 2. sequences WITHOUT “bacteria” in header
 
 ```
 fasta_extract_by_pattern.pl -r -n -p Bacteria seq1.fa seq2.fa > result.fa
 ```
 
-##### sequences with TTSAA (AgsI digest site) in SEQUENCE.  Base S stands for C or G.
+##### 3. sequences with TTSAA (AgsI digest site) in SEQUENCE.  Base S stands for C or G.
 
 ```
 fasta_extract_by_pattern.pl -r -s -p 'TT[C|G]AA' seq.fa > result.fa
 ```
 
-##### sequences (read from STDIN ) with header that matches any patterns in list file
+##### 4. sequences (read from STDIN ) with header that matches any patterns in list file
 
 ```
 zcat seq.fa.gz | fasta_extract_by_pattern.pl -pf name_list.txt > result.fa
