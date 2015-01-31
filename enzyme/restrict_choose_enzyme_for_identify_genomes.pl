@@ -3,7 +3,7 @@
 # Author      : Wei Shen
 # Email       : shenwei356@gmail.com, http://shenwei.me
 # Date        : 2014-12-18
-# Last Update : 2014-12-19
+# Last Update : 2015-01-31
 
 use strict;
 use File::Basename;
@@ -30,17 +30,19 @@ Options:
     -i FILE    Fasta file
     -l FILE    Enzyme list file
     -t INT     Thread number
+    -linear    Linear genome
 
 Example:
 
 See more: https://github.com/shenwei356/bio_scripts
 USAGE
 
-my $help       = 0;
-my $enzymefile = "";
-my $seqfile    = "";
-my $listfile   = "";
-my $threads    = 4;
+my $help          = 0;
+my $enzymefile    = "";
+my $seqfile       = "";
+my $listfile      = "";
+my $threads       = 4;
+my $linear_genome = 0;
 
 GetOptions(
     'help|h' => \$help,
@@ -48,6 +50,7 @@ GetOptions(
     'i=s'    => \$seqfile,
     'l=s'    => \$listfile,
     't=i'    => \$threads,
+    'linear' => \$linear_genome,
 ) or die $usage;
 
 die $usage if $help;
@@ -59,6 +62,7 @@ my $enzs     = parse_embossre($enzymefile);
 my %subenzs  = ();
 my %listhash = ();
 
+my $dir = '';
 if ( $listfile ne "" ) {
     my $list = get_column_data( $listfile, 1 );
     %listhash = map { $_ => 0 } @$list;
@@ -67,36 +71,41 @@ if ( $listfile ne "" ) {
             $subenzs{$enz} = $$enzs{$enz};
         }
     }
+    $dir = "re.$seqfile.digestedby.$listfile";
 }
 else {
     %subenzs = %$enzs;
+    $dir     = "re.$seqfile.digestedby.$enzymefile";
 }
 
 %listhash = ();
 %listhash = map { $_ => 0 } keys %subenzs;
 
-my $dir = "re.$seqfile.digestedby.$listfile";
-unless ( -e $dir and -d $dir ) {
-    rm_and_mkdir($dir);
-    my $runner = Parallel::Runner->new($threads);
-    for my $enz ( keys %subenzs ) {
-        $runner->run(
-            sub {
-                run_emboss_restrict( $dir, $enz );
-            }
-        );
-    }
-    $runner->finish;
+# unless ( -e $dir and -d $dir ) {
+rm_and_mkdir($dir);
+my $runner = Parallel::Runner->new($threads);
+for my $enz ( keys %subenzs ) {
+    $runner->run(
+        sub {
+            run_emboss_restrict( $dir, $enz );
+        }
+    );
 }
+$runner->finish;
+
+# }
 
 sub run_emboss_restrict {
     my ( $dir, $enzyme ) = @_;
     my $resultfile = "$dir/$seqfile.$enzyme.re";
     return if -e $resultfile;
     print STDERR "$enzyme\n";
-    my $cmd = "restrict -auto -solofragment -plasmid -limit "
+    my $cmd = "restrict -auto -solofragment -limit "
         . "-sequence $seqfile -outfile $resultfile -enzymes $enzyme ";
-    run($cmd);
+    $cmd .= " -plasmid " unless $linear_genome;
+
+    my $fail = run($cmd);
+    die "failed to run:$cmd\n" if $fail;
 }
 
 # ===========[ Parsing restriction fragments ]=============
