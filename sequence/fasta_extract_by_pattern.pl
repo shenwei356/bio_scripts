@@ -19,7 +19,7 @@ Options:
     -p,  --pattern STRING      Search pattern
     -pf, --patternfile FILE    Pattern list file (use first column)
     -r,  --useregexp           Use regular expression, case ignored
-    -n,  --not                 Extract sequences NOT match the pattern
+    -n,  --not                 Invert match, extract sequences NOT match the pattern
     -s,  --byseq               Match by sequence 
     -h,  --help                Show this help information
 
