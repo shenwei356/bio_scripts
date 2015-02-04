@@ -39,6 +39,8 @@ parser.add_argument("-pk", type=int, default=1, nargs='?',
 
 parser.add_argument("-r", "--regexp", help='Pattern is regular expression',
                     action="store_true")
+parser.add_argument("-s", "--speedup", help='Delete matched pattern, if you know what it means',
+                    action="store_true")
 parser.add_argument("-n", "--invert", help="Invert match (do not match)",
                     action="store_true")
 
@@ -88,6 +90,8 @@ logging.info("load {} patterns: [{}]".format(len(patterns),
                                              ', '.join(x for x in patterns.keys())))
 logging.info("column number of key in pattern: {}".format(args.pk))
 logging.info("Column number of key in csvfile: {}".format(args.key))
+logging.info("Field separator: ({})".format(args.fs))
+logging.info("Quote char: ({})".format(args.qc))
 
 # pre compile the pattern
 if args.regexp:
@@ -141,6 +145,8 @@ for f in args.csvfile:
             for p in patterns.values():
                 if p.search(key):
                     hit = True
+                    if args.speedup:
+                        del patterns[key]
                     break
         else:
             if key in patterns:  # full match

@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
+
+use strict;
+
+while (<>) {
+    print join( "\n", split( /\t/, $_ ) );
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts
+
+use strict;
+
+my $line = '';
+while ( my $record = <> ) {
+    chomp($record);
+
+    for ( 1 .. 3 ) {
+        $line = <>;
+        chomp($line);
+        $record .= "\t$line";
+    }
+
+    print "$record\n";
+}
