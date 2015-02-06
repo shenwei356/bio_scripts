@@ -13,12 +13,14 @@ my $usage = <<USAGE;
 
 Extract fasta sequences by header (list file) or regular expression (list file)
 
+Version: 2015.02.06
 Usage: $0 [options] [fastafiles...]
 Options:
     
     -p,  --pattern STRING      Search pattern
     -pf, --patternfile FILE    Pattern list file (use first column)
     -r,  --useregexp           Use regular expression, case ignored
+    -d,  --speedup             Delete matched pattern, if you know what it means
     -n,  --not                 Invert match, extract sequences NOT match the pattern
     -s,  --byseq               Match by sequence 
     -h,  --help                Show this help information
@@ -44,6 +46,7 @@ my $para = {};
 GetOptions(
     'help|h'           => \$$para{help},
     'useregexp|r'      => \$$para{useregexp},
+    'speedup|d'        => \$$para{speedup},
     'not|n'            => \$$para{not},
     'pattern|p=s'      => \$$para{pattern},
     'patternfile|pf=s' => \$$para{patternfile},
@@ -52,18 +55,15 @@ GetOptions(
 die $usage if $$para{help};
 
 # get patterns
-my @patterns = ();
-push @patterns, $$para{pattern} if $$para{pattern};
-push @patterns, @{ get_column_data( $$para{patternfile}, 1 ) }
-    if $$para{patternfile};
-die "no patterns given. Type \"$0 -h\" for help.\n" if @patterns == 0;
+my $patterns = {};
+$$patterns{$$para{pattern}} = 1 if $$para{pattern};
+if ( $$para{patternfile} ){
+    $$patterns{$_} = 1 for @{ get_column_data( $$para{patternfile}, 1 ) };
+}
+die "no patterns given. Type \"$0 -h\" for help.\n" if keys %$patterns == 0;
 
 # get the file list
 my @files = file_list_from_argv(@ARGV);
-
-# patterns_map for rapid matching with full pattern
-my %patterns_map = ();
-%patterns_map = map { $_ => 1 } @patterns unless $$para{useregexp};
 
 my $not_trim = 1;
 $not_trim = 0 if $$para{byseq};
@@ -85,15 +85,16 @@ for my $file (@files) {
 
         my $hit = undef;
         if ( $$para{useregexp} ) {    # use regular expression
-            for my $p (@patterns) {
+            for my $p (keys %$patterns) {
                 if ( $object =~ /$p/i ) {
                     $hit = 1;
+                    delete $$patterns{$p} if $$para{speedup};
                     last;
                 }
             }
         }
         else {                        # compare with full header | sequence
-            if ( exists $patterns_map{$object} ) {
+            if ( exists $$patterns{$object} ) {
                 $hit = 1;
             }
         }

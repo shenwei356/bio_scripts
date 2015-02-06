@@ -39,7 +39,7 @@ parser.add_argument("-pk", type=int, default=1, nargs='?',
 
 parser.add_argument("-r", "--regexp", help='Pattern is regular expression',
                     action="store_true")
-parser.add_argument("-s", "--speedup", help='Delete matched pattern, if you know what it means',
+parser.add_argument("-d", "--speedup", help='Delete matched pattern, if you know what it means',
                     action="store_true")
 parser.add_argument("-n", "--invert", help="Invert match (do not match)",
                     action="store_true")
