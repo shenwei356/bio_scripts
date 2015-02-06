@@ -76,3 +76,9 @@ zcat seq.fa.gz | fasta_extract_by_pattern.pl -pf name_list.txt > result.fa
 ### fasta_remove_duplicates.pl
 
 [fasta_remove_duplicates.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_remove_duplicates.pl) could remove duplicated records from file or STDIN, by both sequence and header.
+
+## FASTA
+
+### fastq2tab and tab2fastq
+
+[*fastq2tab*](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fastq2tab) and [*tab2fastq*](https://github.com/shenwei356/bio_scripts/blob/master/sequence/tab2fastq) are similar to fasta2tab and tab2fasta. It could use to filter fastq with help of [*cvs_grep*](https://github.com/shenwei356/bio_scripts/blob/master/util/csv_grep).
