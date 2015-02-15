@@ -33,8 +33,6 @@ https://github.com/shenwei356/bio_scripts
 );
 
 my $opts = {};
-$$opts{-input_type} = 'fasta';
-$$opts{-dbtype}     = 'nucl';
 
 getopt( $opts, \@ARGV );
 
@@ -42,6 +40,8 @@ die $usage unless exists $$opts{-in} and exists $$opts{-out};
 die "file not exists: $$opts{-in}\n" unless -e $$opts{-in};
 
 $$opts{-title} = $$opts{-out} unless exists $$opts{-title};
+$$opts{-dbtype} = 'nucl' unless exists $$opts{-dbtype};
+$$opts{-input_type} = 'fasta' unless exists $$opts{-input_type};
 
 my $cmd = '';
 my ( $file_mask_asnb, $file_mask_counts ) = (undef) x 2;

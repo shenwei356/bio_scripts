@@ -26,10 +26,9 @@ https://github.com/shenwei356/bio_scripts
 
 );
 
-my $opts = {};
-$$opts{-program}     = 'blastn';
-$$opts{-num_threads} = `cat /proc/cpuinfo | grep processor |wc -l`;
-$$opts{-num_threads} =~ s/\n//g;
+my $opts    = {};
+my $threads = `cat /proc/cpuinfo | grep processor |wc -l`;
+$threads =~ s/\n//g;
 my $outfmt7shenwei356
     = '7 qseqid sseqid qlen length pident ppos qcovs qcovhsp'
     . ' mismatch gapopen gaps sstrand qstart qend sstart send'
@@ -38,13 +37,16 @@ $$opts{-outfmt} = [ 0, $outfmt7shenwei356 ];
 
 getopt( $opts, \@ARGV );
 
+$$opts{-program}     = 'blastn' unless exists $$opts{-program};
+$$opts{-num_threads} = $threads unless exists $$opts{-num_threads};
+
 # print "$_: $$opts{$_}\n" for sort keys %$opts;
 
 die $usage unless exists $$opts{-query} and exists $$opts{-db};
 die "file not exists: $$opts{-query}\n" unless -e $$opts{-query};
 
 my $info = sprintf "%s.%s@%s", quotemeta $$opts{-query}, $$opts{-program},
-    basename($$opts{-db});
+    basename( $$opts{-db} );
 $$opts{-out} = $info unless exists $$opts{-out};
 
 my $cmd = "";

@@ -17,7 +17,7 @@ die "seqtype should be \"aa\" or \"nt\".\n"
 
 my $cdses = get_cds_from_genbank_file($file);
 for my $cds (@$cdses) {
-    print ">$$cds{seqid}_cds_$$cds{start}..$$cds{end}_$$cds{strand}\n"
+    print ">$$cds{seqid}_$$cds{start}..$$cds{end}..$$cds{strand}_$$cds{product}\n"
         . $$cds{$seqtype} . "\n";
 }
 

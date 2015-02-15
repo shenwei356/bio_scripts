@@ -6,7 +6,7 @@ use File::Basename;
 use BioUtil::Seq;
 
 $0 = basename($0);
-my $usage = q(
+my $usage = qq(
     usage: $0 <glimmer .predict file> <genome file>
 
 );
@@ -29,6 +29,6 @@ while (<$fh>) {
     else {
         $seq = revcom( substr( $genome, $b - 1, ( $a - $b + 1 ) ) );
     }
-    print ">$name $a, $b, $frame\n", format_seq($seq);
+    print ">${name}_${a}..${b}..$frame\n", format_seq($seq);
 }
 close $fh;

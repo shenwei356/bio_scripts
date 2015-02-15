@@ -48,12 +48,12 @@ args = parser.parse_args()
 
 # logging level
 if args.verbose >= 2:
-    logginglevel = logging.DEBUG
+    level = logging.DEBUG
 elif args.verbose == 1:
-    logginglevel = logging.INFO
+    level = logging.INFO
 else:
-    logginglevel = logging.WARN
-logging.basicConfig(level=logginglevel,
+    level = logging.WARN
+logging.basicConfig(level=level,
                     format="[%(levelname)s] %(message)s")
 
 # check args
