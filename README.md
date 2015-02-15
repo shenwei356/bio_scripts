@@ -1,13 +1,13 @@
 Bio_scripts
 ========
 
-Some scripts in bioinformatics.
+Scripts for bioinformatics.
 
-See more utilitis in BioUtil module from [CPAN](http://search.cpan.org/search?query=BioUtil&mode=all) 
+See README in sub derectories.
 
 -------
 
-Copyright (c) 2014, Wei Shen (shenwei356@gmail.com)
+Copyright (c) 2014-2015, Wei Shen (shenwei356@gmail.com)
 
 
 [MIT License](https://github.com/shenwei356/bio_scripts/blob/master/LICENSE)

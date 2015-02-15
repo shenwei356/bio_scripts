@@ -54,7 +54,8 @@ could extract FASTA sequences by header or sequence, exactly matching or regular
 expression matching are both supported. The query pattern could read from files.
 And negation of the result is also easy to get. What's the most important, it could read from STDIN.  
 
-combining fasta2tab and tab2fasta with [*cvs_grep*](https://github.com/shenwei356/bio_scripts/blob/master/util/csv_grep) could also have the same function
+Combining fasta2tab and tab2fasta with [*cvs_grep*](https://github.com/shenwei356/bio_scripts/blob/master/util/csv_grep)
+could also have the same function.
 
 #### Examples
 
@@ -84,11 +85,16 @@ zcat seq.fa.gz | fasta_extract_by_pattern.pl -pf name_list.txt > result.fa
 
 ### fasta_common_seqs.pl
 
-[fasta_common_seqs.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_common_seqs.pl) is used to find common sequences in multiple files. It supports comparing by header or sequence. By storing the MD5 value of sequences, it has a low memory usage. It’s also could be used to remove duplicated records, by finding common sequencing from the file and its copy or soft link.
+[fasta_common_seqs.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_common_seqs.pl)
+is used to find common sequences in multiple files. It supports comparing by header or sequence. 
+By storing the MD5 value of sequences, it has a low memory usage. It’s also could be 
+used to remove duplicated records, by finding common sequencing from the
+file and its copy or soft link.
 
 ### fasta_remove_duplicates.pl
 
-[fasta_remove_duplicates.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_remove_duplicates.pl) could remove duplicated records from file or STDIN, by both sequence and header.
+[fasta_remove_duplicates.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_remove_duplicates.pl)
+could remove duplicated records from file or STDIN, by both sequence and header.
 
 ## FASTQ
 
