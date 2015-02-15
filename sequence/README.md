@@ -43,6 +43,8 @@ zcat seq.fa.gz | fasta2tab -uc -rc -t | tab2fasta
 
 [fasta_extract_by_pattern.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_extract_by_pattern.pl) could extract FASTA sequences by header or sequence, exactly matching or regular expression matching are both supported. The query pattern could read from files. And negation of the result is also easy to get. What's the most important, it could read from STDIN.  
 
+combining fasta2tab and tab2fasta with [*cvs_grep*](https://github.com/shenwei356/bio_scripts/blob/master/util/csv_grep) could also have the same function
+
 #### Examples
 
 ##### 1. sequences WITH "bacteria" in header
