@@ -12,7 +12,8 @@ import re
 
 # ===================================[ args ]=================================
 
-parser = argparse.ArgumentParser(description="Grep CSV file")
+parser = argparse.ArgumentParser(description="Grep CSV file", 
+                    epilog="https://github.com/shenwei356/bio_scripts")
 
 parser.add_argument('csvfile', nargs='*', type=argparse.FileType('r'),
                     default=sys.stdin, help='Input file(s)')

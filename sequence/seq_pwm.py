@@ -25,7 +25,7 @@ def parse_args():
 
     args = parser.parse_args()
     if not ( args.stdin or args.infile ):
-        print("one of option --stdin or -i should be given", file=sys.stderr)
+        print("option --stdin or -i should be given", file=sys.stderr)
         sys.exit(1)
 
     return args
@@ -35,7 +35,7 @@ def seq_iter(file):
     if file:
         found = re.search(r'(?i)(fasta|fa|fastq|fq)(.gz)?$', file)
         if not found:
-            print("invalid file name suffix", file=sys.stderr)
+            print("invalid file name suffix.\nfile name should like this: infile.[fasfa|fa|fastq|fq][.gz]", file=sys.stderr)
             sys.exit(1)
         seq_format, is_gz = found.groups()
         if seq_format == 'fa':
@@ -59,4 +59,4 @@ if __name__ == '__main__':
     m = motifs.create(seqs2)
     print(m.pwm)
     # print(m.pssm)
-    m.weblogo("motif.png")
+    # m.weblogo("motif.png")
