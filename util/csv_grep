@@ -143,11 +143,11 @@ for f in args.csvfile:
 
         hit = False
         if args.regexp:  # use regular expression
-            for p in patterns.values():
+            for k, p in patterns.items():
                 if p.search(key):
                     hit = True
                     if args.speedup:
-                        del patterns[key]
+                        del patterns[k]
                     break
         else:
             if key in patterns:  # full match

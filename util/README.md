@@ -45,7 +45,7 @@ Column number of key in target file or pattern file is settable.
 	123     134     我
 	245     135     "string with    tab"
 
-Find lines of which the 2nd columns are digitals, ignoring title
+Find lines of which the 2nd column are digitals, ignoring title
 
 	$ cat testdata/data.tab | csv_grep -H   -k 2    -p '^\d+$'   -r
 	str     123     abde
