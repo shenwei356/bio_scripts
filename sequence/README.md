@@ -96,6 +96,11 @@ file and its copy or soft link.
 [fasta_remove_duplicates.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_remove_duplicates.pl)
 could remove duplicated records from file or STDIN, by both sequence and header.
 
+### fasta_locate_motif.pl
+
+[fasta_locate_motif.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_locate_motif.pl)
+could find restrict enzyme recognition site or other motif location.
+
 ## FASTQ
 
 ### fastq2tab and tab2fastq
