@@ -31,7 +31,7 @@ while ( my $fa = &$next_seq() ) {
         my $sites = degenerate_seq_match_sites($qseq_r, $seq);
         for my $site (@$sites) { 
             my ($start, $end, $matched) = @$site;           
-            print "$header\t$qname\t$start\t$end\t-\t$matched\n";
+            print "$header\t$qname\t$start\t$end\t-\t".revcom($matched)."\n";
         }
     }
 }
