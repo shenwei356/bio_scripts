@@ -75,12 +75,12 @@ if args.patternfile:
     with open(args.patternfile, newline='') as patternfile:
         reader = csv.reader(patternfile, delimiter=args.fs, quotechar=args.qc)
         for row in reader:
-            nrow = len(row)
-            if nrow == 0:
+            ncolumn = len(row)
+            if ncolumn == 0:
                 continue
-            if nrow < args.pk:
+            if ncolumn < args.pk:
                 logging.error(
-                    "-pk ({}) is beyond number of column ({})".format(args.pk, nrow))
+                    "-pk ({}) is beyond number of column ({})".format(args.pk, ncolumn))
                 sys.exit(1)
             elif args.pk < 1:
                 args.pk = 1
