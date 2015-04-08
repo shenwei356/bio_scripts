@@ -30,7 +30,7 @@ my $opts    = {};
 my $threads = `cat /proc/cpuinfo | grep processor |wc -l`;
 $threads =~ s/\n//g;
 my $outfmt7shenwei356
-    = '7 qseqid sseqid qlen length pident ppos qcovs qcovhsp'
+    = '7 qseqid sseqid qlen slen length pident ppos qcovs qcovhsp'
     . ' mismatch gapopen gaps sstrand qstart qend sstart send'
     . ' evalue bitscore staxids salltitles';
 $$opts{-outfmt} = [ 0, $outfmt7shenwei356 ];
