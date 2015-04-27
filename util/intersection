@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# https://github.com/shenwei356/bio_scripts
+
+from __future__ import print_function
+import sys
+
+if len(sys.argv) <= 2:
+    print(">=2 files needed", file=sys.stderr)
+    sys.exit(1)
+
+
+def read_data_as_set(file):
+    with open(file, 'rt') as fh:
+        return set(line.strip() for line in fh.readlines())
+
+
+intersection = read_data_as_set(sys.argv[1])
+
+for i in range(2, len(sys.argv)):
+    intersection.intersection_update(read_data_as_set(sys.argv[i]))
+
+for item in sorted(intersection):
+    print(item)

@@ -6,6 +6,7 @@ use strict;
 my $line = '';
 while ( my $record = <> ) {
     chomp($record);
+    $record =~ s/^\@//;
 
     for ( 1 .. 3 ) {
         $line = <>;
