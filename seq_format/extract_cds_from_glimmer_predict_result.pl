@@ -4,6 +4,7 @@
 use strict;
 use File::Basename;
 use BioUtil::Seq;
+use BioUtil::Util;
 
 $0 = basename($0);
 my $usage = qq(
@@ -21,7 +22,7 @@ my ( $name, $a, $b, $frame, $seq );
 open my $fh, '<', $prfile or die "fail to open file: $prfile\n";
 while (<$fh>) {
     @data = split /\s+/, $_;
-    next unless @data == 5;
+    next unless scalar(@data) >= 9;
     ( $name, $a, $b, $frame ) = @data;
     if ( $frame > 0 ) {
         $seq = substr( $genome, $a - 1, ( $b - $a + 1 ) );
