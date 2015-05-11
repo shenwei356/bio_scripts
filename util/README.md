@@ -83,15 +83,3 @@ so we add a new column as the key and remove it at last.
 	awk -F"\t" '{print $0"\t"$1""$4""$5""$7}' d.gtf > d1.gtf
 	cat c1.gtf | python3 csv_grep -k 10 -pf d1.gtf -pk 10 | awk 'NF-=1' > common.gtf
 	
-## plot_distribution.py
-
-Distribution plot using seaborn
-
-Example: distribution of sequence length 
-
-	cat ../sequence/seq.fa | fasta2tab -l | cut -f 3 |  \
-		plot_distribution.py -t "Disribution of sequence length" -x "sequence length" -o pic.png
-
-Sample output:
-
-![Sample output](data.txt.png)
