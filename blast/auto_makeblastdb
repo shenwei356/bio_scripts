@@ -76,5 +76,6 @@ if ( $$opts{-mask} ) {
     $cmd .= " -mask_data $file_mask_asnb";
 }
 
+print STDERR "$cmd\n";
 my $fail = run($cmd);
 die "failed to run:$cmd\n" if $fail;

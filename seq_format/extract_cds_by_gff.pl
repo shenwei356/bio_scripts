@@ -8,10 +8,10 @@ use BioUtil::Util;
 use Data::Dumper;
 
 $0 = basename($0);
-my $usage = q(
+my $usage = qq(
 Usage: $0 [options] gff_file fasta_file
 Options:
-    -t,   --type         gene type [CDS]
+    -t,   --type         gene type (CDS or mRNA) [CDS]
     -us,  --up-stream    up stream length [0]
     -ds,  --down-stream  down stream length [0]
     -h,   --help         show this usage
