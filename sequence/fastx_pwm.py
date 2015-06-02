@@ -21,7 +21,7 @@ def parse_args():
     group.add_argument("--stdin", action="store_true",
                        help='read from stdin, one sequence per line')
     group.add_argument('-i', '--infile', type=str,
-                       help='file name should like this: infile.[fasfa|fa|fastq|fq][.gz]')
+                       help='file name should like this: infile.[fasta|fa|fastq|fq][.gz]')
 
     args = parser.parse_args()
     if not ( args.stdin or args.infile ):
