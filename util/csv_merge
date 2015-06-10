@@ -8,49 +8,75 @@ import logging
 args = None
 
 
+def parse_key_index(key):
+    if ',' in key:
+        return [int(i) for i in key.split(',')]
+    else:
+        return [int(key)]
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Merge csvfile1 to csvfile2",
+    parser = argparse.ArgumentParser(description="Merge csvfile2 to csvfile1",
                                      epilog="https://github.com/shenwei356/bio_scripts")
 
-    parser.add_argument('csvfile1', type=str, help='cvsfile1')
-    parser.add_argument("key1", type=int, help='Column number of key in csvfile1')
-    parser.add_argument('csvfile2', type=str, help='cvsfile2')
-    parser.add_argument("key2", type=int, help='Column number of key in csvfile2')
-    parser.add_argument("-H1", help="not containing head in cvsfile1", action="store_true")
-    parser.add_argument("-H2", help="not containing head in cvsfile2", action="store_true")
-    parser.add_argument("-F", '--fs', type=str, default="\t",
-                        help='Field separator [\\t]')
-    parser.add_argument("-Q", '--qc', type=str, default='"',
-                        help='Quote char["]')
+    parser.add_argument('csvfile1', type=str, help='CSV file 1')
+    parser.add_argument("key1", type=str,
+                        help='Column number of key in csvfile1. Multiple values shoud be separated by comma.')
+    parser.add_argument('csvfile2', type=str, help='CSV file 2')
+    parser.add_argument("key2", type=str,
+                        help='Column number of key in csvfile2. Multiple values shoud be separated by comma.')
+
+    parser.add_argument("-f1", type=str, default=",",
+                        help='Field separator in csvfile1 [,]')
+    parser.add_argument("-q1", type=str, default='"',
+                        help='Quote char in csvfile1 ["]')
+    parser.add_argument("-f2", type=str, default=",",
+                        help='Field separator in csvfile2 [,]')
+    parser.add_argument("-q2", type=str, default='"',
+                        help='Quote char in csvfile2 ["]')
+    parser.add_argument("-of", type=str, default=",",
+                        help='Field separator in csvfile1 [,]')
+
+    parser.add_argument("-t1", action='store_true',
+                        help='csvfile1 is table file. Quote char is "\\t"')
+    parser.add_argument("-t2", action='store_true',
+                        help='csvfile1 is table file. Quote char is "\\t"')
+    parser.add_argument("-to", action='store_true',
+                        help='Output quote char is "\\t"')
 
     args = parser.parse_args()
+
+    if args.t1:
+        args.f1 = '\t'
+    if args.t2:
+        args.f2 = '\t'
+    if args.to:
+        args.of = '\t'
 
     return args
 
 
-def read_csv_file(file, key):
-    data, indexdict = [], {}
-    index = 0
+def read_csv_file(file, key_index, fs, qc):
+    data = dict()
 
     with open(file, newline='') as fh:
-        reader = csv.reader(fh, delimiter=args.fs, quotechar=args.qc)
+        reader = csv.reader(fh, delimiter=fs, quotechar=qc)
         for row in reader:
             ncolumn = len(row)
             if ncolumn == 0:
                 continue
-            if ncolumn < key:
-                logging.error(
-                    "key ({}) is beyond number of column ({})".format(key, ncolumn))
-                print(row)
-                sys.exit(1)
-            elif key < 1:
-                args.pk = 1
 
-            data.append(row)
-            indexdict[row[key - 1].strip()] = index
-            index += 1
+            key = list()
+            for k in parse_key_index(key_index):
+                if ncolumn < k:
+                    logging.error(
+                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.exit(1)
+                key.append(row[k - 1].strip())
+            key = '_'.join(key)
+            data[key] = row
 
-    return data, indexdict
+    return data
 
 
 if __name__ == '__main__':
@@ -58,16 +84,27 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    data1, map1 = read_csv_file(args.csvfile1, args.key1)
-    data2, map2 = read_csv_file(args.csvfile2, args.key2)
+    data = read_csv_file(args.csvfile2, args.key2, args.f2, args.q2)
 
-    if not args.H2:
-        print('\t'.join(data2[0]), end='')
-        data2 = data2[1:]
-        if not args.H1:
-            print('\t', end='')
-            print('\t'.join(data1[0]), end='')
-        print()
+    file, fs, qc, key_index = args.csvfile1, args.f1, args.q1, args.key1
 
-    for row in data2:
-        print('\t'.join(row), '\t'.join(data1[map1[row[args.key2 - 1]]]), sep='\t')
+    writter = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
+    with open(file, newline='') as fh:
+        reader = csv.reader(fh, delimiter=fs, quotechar=qc)
+        for row in reader:
+            ncolumn = len(row)
+            if ncolumn == 0:
+                continue
+
+            key = list()
+            for k in parse_key_index(key_index):
+                if ncolumn < k:
+                    logging.error(
+                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.exit(1)
+                key.append(row[k - 1].strip())
+            key = '_'.join(key)
+
+            if key in data:
+                writter.writerow(row + data[key])
+

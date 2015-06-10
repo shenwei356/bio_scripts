@@ -1,5 +1,5 @@
-column1;column 2;3rd c
-str;123;"abde"
-123;134;"我"
-245;135;"string with;semicolon"
+column1,column 2,3rd c
+str,123,"abde"
+123,134,"我"
+245,135,"string with,comma"
 

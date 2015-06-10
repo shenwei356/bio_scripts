@@ -6,7 +6,6 @@ import os
 import sys
 import gzip
 import re
-from Bio import motifs
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -23,7 +22,7 @@ def parse_args():
                        help='read from stdin, one sequence per line')
     group.add_argument('-i', '--infile', type=str,
                        help='file name should like this: infile.[fasta|fa|fastq|fq][.gz]')
-    parser.add_argument('-f', '--format', type=str, default='fasta',
+    parser.add_argument('-f', '--format', type=str, # default='fasta',
                         help='seqence format: fasta |fastq  [fasta]')
     parser.add_argument('-t', '--table', type=int, default=1,
                         help='genetic code table (detail: http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi ) [1]')
@@ -45,9 +44,9 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
-    file, fh, seq_format = args.infile, None, 'fasta'
+    file, seq_format, fh = args.infile, args.format,  None,
     if file:
-        if not args.format:
+        if not seq_format:
             found = re.search(r'(?i)(fasta|fa|fastq|fq)(.gz)?$', file)
             if not found:
                 print("invalid file name suffix.\nfile name should like this: infile.[fasfa|fa|fastq|fq][.gz]",
@@ -59,12 +58,12 @@ if __name__ == '__main__':
             if seq_format == 'fq':
                 seq_format = 'fastq'
 
-        fh = gzip.open(file, 'rt') if is_gz else open(file, 'r')
+        fh = gzip.open(file, 'rt') if file.endswith('.gz') else open(file, 'r')
     else:
         fh = sys.stdin
         seq_format = args.format
 
     for seq in SeqIO.parse(fh, seq_format):
-        SeqIO.write([SeqRecord(seq.seq.translate(table=args.table), id=seq.id, description='')], sys.stdout, seq_format)
+        SeqIO.write([SeqRecord(seq.seq.translate(table=args.table), id=seq.id, description='')], sys.stdout, 'fasta')
 
     fh.close()
