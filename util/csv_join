@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+# https://github.com/shenwei356/bio_scripts
+# Author     : Wei Shen
+# Contact    : shenwei356@gmail.com
+# LastUpdate : 2015-06-12
 
 import argparse
 import csv
 import sys
 import logging
-
-args = None
 
 
 def parse_key_index(key):
@@ -43,15 +45,23 @@ def parse_args():
                         help='csvfile1 is table file. Quote char is "\\t"')
     parser.add_argument("-to", action='store_true',
                         help='Output quote char is "\\t"')
+    parser.add_argument("-t", action='store_true',
+                        help='abbr for "-t1 -t2 -to"')
+
+    parser.add_argument("-k", "--keep-unmatched", action='store_true',
+                        help='keep rows in CSV file1 not matching row in file2"')
 
     args = parser.parse_args()
 
-    if args.t1:
-        args.f1 = '\t'
-    if args.t2:
-        args.f2 = '\t'
-    if args.to:
-        args.of = '\t'
+    if args.t:
+        args.f1, args.f2, args.of = '\t', '\t', '\t'
+    else:
+        if args.t1:
+            args.f1 = '\t'
+        if args.t2:
+            args.f2 = '\t'
+        if args.to:
+            args.of = '\t'
 
     return args
 
@@ -88,7 +98,7 @@ if __name__ == '__main__':
 
     file, fs, qc, key_index = args.csvfile1, args.f1, args.q1, args.key1
 
-    writter = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
+    writer = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
     with open(file, newline='') as fh:
         reader = csv.reader(fh, delimiter=fs, quotechar=qc)
         for row in reader:
@@ -106,5 +116,6 @@ if __name__ == '__main__':
             key = '_'.join(key)
 
             if key in data:
-                writter.writerow(row + data[key])
-
+                writer.writerow(row + data[key])
+            elif args.keep_unmatched:
+                writer.writerow(row)
