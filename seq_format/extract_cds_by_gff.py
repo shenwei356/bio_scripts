@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# https://github.com/shenwei356/bio_scripts
 
 from __future__ import print_function
 import argparse

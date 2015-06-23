@@ -8,12 +8,13 @@ use BioUtil::Util;
 
 $0 = basename($0);
 my $usage = qq(
-    usage: $0 <glimmer .predict file> <genome file>
+    usage: $0 <glimmer .predict file> <genome file> [gtf]
 
 );
-die $usage unless @ARGV == 2;
+die $usage unless @ARGV == 2 or @ARGV == 3;
 my $prfile  = shift @ARGV;
 my $seqfile = shift @ARGV;
+my $gtf     = shift @ARGV;
 
 my $genome = ( values %{ read_sequence_from_fasta_file($seqfile) } )[0];
 
@@ -24,12 +25,19 @@ while (<$fh>) {
     @data = split /\s+/, $_;
     next unless scalar(@data) >= 9;
     ( $name, $a, $b, $frame ) = @data;
-    if ( $frame > 0 ) {
-        $seq = substr( $genome, $a - 1, ( $b - $a + 1 ) );
+
+    if ( defined $gtf ) {
+        printf "%s\t%s\t%s\t%d\t%d\t%f\t%s\t%s\t%s\n",
     }
     else {
-        $seq = revcom( substr( $genome, $b - 1, ( $a - $b + 1 ) ) );
+        if ( $frame > 0 ) {
+            $seq = substr( $genome, $a - 1, ( $b - $a + 1 ) );
+        }
+        else {
+            $seq = revcom( substr( $genome, $b - 1, ( $a - $b + 1 ) ) );
+        }
+        print ">${name}_${a}..${b}..$frame\n", format_seq($seq);
     }
-    print ">${name}_${a}..${b}..$frame\n", format_seq($seq);
+
 }
 close $fh;
