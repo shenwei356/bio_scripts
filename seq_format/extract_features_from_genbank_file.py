@@ -54,19 +54,19 @@ if __name__ == '__main__':
                 strand = '+' if f.strand > 0 else '-'
 
                 qualifiers = f.qualifiers
-                frame = int(qualifiers['codon_start'][0]) - 1 if 'codon_start' in qualifiers else 0
                 product = qualifiers['product'][0] if 'product' in qualifiers else ''
-                if args.table:
-                    transl_table = args.table
-                elif 'transl_table' in qualifiers:
-                    transl_table = qualifiers['transl_table']
-                else:
-                    sys.stderr.write('[WARNING] neither translate table given or found in features. set 1\n')
-                    transl_table = 1
 
                 if args.outfmt == 'fasta':
                     seq = None
                     if args.peptide:
+                        if args.table:
+                            transl_table = args.table
+                        elif 'transl_table' in qualifiers:
+                            transl_table = qualifiers['transl_table']
+                        else:
+                            sys.stderr.write('[WARNING] neither translate table given or found in features. set 1\n')
+                            transl_table = 1
+
                         if 'translation' in qualifiers:
                             seq = Seq(qualifiers['translation'][0])
                         else:
@@ -75,9 +75,31 @@ if __name__ == '__main__':
                         seq = record.seq[start:end]
 
                     SeqIO.write(
-                        [SeqRecord(seq, id='{}_{}..{}..{}'.format(record.name, start + 1, end, strand), description=product)],
+                        [SeqRecord(seq, id='{}_{}..{}..{}'.format(record.name, start + 1, end, strand),
+                                   description=product)],
                         sys.stdout, "fasta")
+
                 elif args.outfmt == 'gtf':
+                    frame = int(qualifiers['codon_start'][0]) - 1 if 'codon_start' in qualifiers else 0
+
+                    if 'locus_tag' in qualifiers:
+                        gene_id = transcript_id = f.qualifiers['locus_tag'][0]
+                    else:
+                        gene_id = transcript_id = ''
+
+                    attribute = 'gene_id "{}"; transcript_id "{}"'.format(gene_id, transcript_id)
+
+                    if 'gene' in qualifiers:
+                        attribute += '; gene_id "{}"'.format(qualifiers['gene'][0])
+                    if 'protein_id' in f.qualifiers:
+                        attribute += '; protein_id "{}"'.format(qualifiers['protein_id'][0])
+
+                    if 'db_xref' in qualifiers:
+                        for ext in qualifiers['db_xref']:
+                            attribute += '; db_xref "{}"'.format(ext)
+
+                    attribute += '; product "{}"'.format(product)
+
                     sys.stdout.write('\t'.join(
-                        [record.name, 'genbank', f.type, str(start + 1), str(end), '.', strand, str(frame),
-                         product]) + "\n")
+                        [record.id, 'genbank', f.type, str(start + 1), str(end), '.', strand, str(frame),
+                         attribute]) + "\n")
