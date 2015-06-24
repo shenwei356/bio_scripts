@@ -6,9 +6,13 @@ import sys
 from collections import defaultdict
 import pysam
 
-parser = argparse.ArgumentParser(description="bam2gff")
+parser = argparse.ArgumentParser(description="bam2gff",
+                                 epilog="https://github.com/shenwei356/bio_scripts")
 
 parser.add_argument('bamfile', type=str, help='bam file')
+parser.add_argument('-c', '--cache-size', type=int, default=1000, help='cache size [1000]')
+parser.add_argument('-m', '--match-proportion', type=float, default=0.75,
+                    help='minimum match proportion to define properly paired ends [0.75]')
 
 parser.add_argument("-v", "--verbose", help='verbosely print information',
                     action="count", default=0)
@@ -48,7 +52,7 @@ for read in samfile.fetch():
                                                                          'end': read.reference_end,
                                                                          'ref': samfile.getrname(read.reference_id),
                                                                          'reverse': read.is_reverse}
-        if len(pairs) > 1000:
+        if len(pairs) > args.cache_size:
             pairs2gff(pairs)
 
 samfile.close()
