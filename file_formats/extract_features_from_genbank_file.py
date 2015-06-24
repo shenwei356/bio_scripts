@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # https://github.com/shenwei356/bio_scripts
 
-from __future__ import print_function
 import sys
-import os
 import argparse
-import logging
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -19,7 +16,7 @@ def parse_args():
     parser.add_argument('gbkfile', type=str, help='Genbank file')
     parser.add_argument('-t', '--type', type=str, default='CDS',
                         help='Feature type (CDS tRNA). Multiple values should be separated by comma.')
-    outfmt_choices = ['fasta', 'gtf']
+    outfmt_choices = ['fasta', 'gtf', 'gff']
     parser.add_argument('-f', '--outfmt', type=str, default='fasta',
                         help='Out format, fasta or gtf')
 
@@ -103,3 +100,9 @@ if __name__ == '__main__':
                     sys.stdout.write('\t'.join(
                         [record.id, 'genbank', f.type, str(start + 1), str(end), '.', strand, str(frame),
                          attribute]) + "\n")
+
+                elif args.outfmt == 'gff':
+                    frame = int(qualifiers['codon_start'][0]) - 1 if 'codon_start' in qualifiers else 0
+                    sys.stdout.write('\t'.join(
+                        [record.id, 'genbank', f.type, str(start + 1), str(end), '.', strand, str(frame),
+                         product]) + "\n")
