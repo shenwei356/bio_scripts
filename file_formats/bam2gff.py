@@ -43,8 +43,8 @@ for read in samfile.fetch():
                 strand, start, end = '-', read2['start'], read1['end']
 
             sys.stdout.write('\t'.join(
-                [read.query_name, 'bam2gff.py', 'paired_ends', str(start + 1), str(end), '.', strand, '.',
-                 read1['ref']]) + "\n")
+                [read1['ref'], 'bam2gff.py', 'paired_ends', str(start + 1), str(end), '.', strand, '.',
+                 read.query_name]) + "\n")
 
             stats['paired'] += 1
 
@@ -57,4 +57,4 @@ for query, sites in pairs.items():
         continue
     stats['unpaired'] += 1
 
-sys.stderr.write('summary: {}\n'.format(stats))
+sys.stderr.write('{} summary: {}\n'.format(args.bamfile, stats))
