@@ -33,7 +33,8 @@ def read_gff_file(file):
                 continue
             name = data[0]
             gene = dict()
-            gene['type'], gene['start'], gene['end'], gene['strand'] = data[2], int(data[3]), int(data[4]), data[6]
+            gene['type'], gene['start'], gene['end'], gene['strand'], gene['product'] = data[2], int(data[3]), int(
+                data[4]), data[6], data[8]
             genes[name].append(gene)
 
     return genes
@@ -61,6 +62,6 @@ for record in SeqIO.parse(fh, 'fasta'):
             s = 0 if s < 0 else s
             seq = genome[s:gene['end'] + args.up_stream].reverse_complement()
         SeqIO.write(
-            SeqRecord(seq, id='{}_{}..{}..{}'.format(name, gene['start'], gene['end'], gene['strand']), description=''),
-            sys.stdout, 'fasta')
+            SeqRecord(seq, id='{}_{}..{}..{}'.format(name, gene['start'], gene['end'], gene['strand']),
+                      description=gene['product']), sys.stdout, 'fasta')
 fh.close()
