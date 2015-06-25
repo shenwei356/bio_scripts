@@ -3,7 +3,7 @@
 
 import argparse
 import sys
-from collections import defaultdict
+from collections import defaultdict, Counter
 import pysam
 
 parser = argparse.ArgumentParser(description="bam2gff",
@@ -19,42 +19,42 @@ parser.add_argument("-v", "--verbose", help='verbosely print information',
 
 args = parser.parse_args()
 
-pairs = defaultdict(dict)
-
-
-def pairs2gff(pairs):
-    todelete = list()
-    for query, pair in pairs.items():
-        if len(pair.keys()) < 2:
-            continue
-        read1, read2 = pair['read1'], pair['read2']
-
-        if not read1['reverse']:
-            strand, start, end = '+', read1['start'], read2['end']
-        else:
-            strand, start, end = '-', read2['start'], read1['end']
-
-        sys.stdout.write('\t'.join(
-            [query, 'bam2gff.py', 'paired_ends', str(start + 1), str(end), '.', strand, '.',
-             read1['ref']]) + "\n")
-        todelete.append(query)
-    for query in todelete:
-        del pairs[query]
-
-
+pairs = defaultdict(lambda: defaultdict(dict))
+stats = Counter()
 samfile = pysam.AlignmentFile(args.bamfile, "rb")
 for read in samfile.fetch():
     if read.is_proper_pair and not read.is_secondary:
         if read.reference_length < read.query_length * 0.75:  # full match
+            stats['bad match'] += 1
             continue
+        key = '_'.join([str(x) for x in sorted([read.reference_start, read.next_reference_start])])
+        pairs[read.query_name][key]['read1' if read.is_read1 else 'read2'] = {'start': read.reference_start,
+                                                                              'end': read.reference_end,
+                                                                              'ref': samfile.getrname(
+                                                                                  read.reference_id),
+                                                                              'reverse': read.is_reverse}
 
-        pairs[read.query_name]['read1' if read.is_read1 else 'read2'] = {'start': read.reference_start,
-                                                                         'end': read.reference_end,
-                                                                         'ref': samfile.getrname(read.reference_id),
-                                                                         'reverse': read.is_reverse}
-        if len(pairs) > args.cache_size:
-            pairs2gff(pairs)
+        if 'read1' in pairs[read.query_name][key] and 'read2' in pairs[read.query_name][key]:
+            read1, read2 = pairs[read.query_name][key]['read1'], pairs[read.query_name][key]['read2']
+
+            if not read1['reverse']:
+                strand, start, end = '+', read1['start'], read2['end']
+            else:
+                strand, start, end = '-', read2['start'], read1['end']
+
+            sys.stdout.write('\t'.join(
+                [read.query_name, 'bam2gff.py', 'paired_ends', str(start + 1), str(end), '.', strand, '.',
+                 read1['ref']]) + "\n")
+
+            stats['paired'] += 1
+
+            del pairs[read.query_name][key]
 
 samfile.close()
 
-pairs2gff(pairs)
+for query, sites in pairs.items():
+    if len(sites) == 0:
+        continue
+    stats['unpaired'] += 1
+
+sys.stderr.write('summary: {}\n'.format(stats))

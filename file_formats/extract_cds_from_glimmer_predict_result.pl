@@ -22,16 +22,22 @@ my @data = ();
 my ( $genome, $name, $a, $b, $frame, $seq );
 open my $fh, '<', $prfile or die "fail to open file: $prfile\n";
 while (<$fh>) {
+    s/\r?\n//g;
     $genome = $1 if /^>(.+)/;
     @data = split /\s+/, $_;
     next unless scalar(@data) == 5;
     ( $name, $a, $b, $frame ) = @data;
     next unless $a =~ /^\d+$/;
+    if ($a > $b) {
+        my $tmp = $a;
+        $a = $b;
+        $b = $tmp;
+    }
 
     if ( $gtf eq 'gff' ) {
         my $strand = $frame > 0 ? '+' : '-';
         printf "%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n",
-             $name, 'glimmer', 'CDS', $a, $b, '.', $strand, '.', $genome;
+             $genome, 'glimmer', 'CDS', $a, $b, '.', $strand, '.', $name;
     }
     else {
         if ( $frame > 0 ) {
