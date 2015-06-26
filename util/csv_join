@@ -2,7 +2,7 @@
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com
-# LastUpdate : 2015-06-12
+# LastUpdate : 2015-06-26
 
 import argparse
 import csv
@@ -18,7 +18,7 @@ def parse_key_index(key):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Merge csvfile2 to csvfile1",
+    parser = argparse.ArgumentParser(description="Merge csvfile2 to csvfile1. Multiple keys supported.",
                                      epilog="https://github.com/shenwei356/bio_scripts")
 
     parser.add_argument('csvfile1', type=str, help='CSV file 1')
@@ -84,6 +84,7 @@ def read_csv_file(file, key_index, fs, qc):
                     sys.exit(1)
                 key.append(row[k - 1].strip())
             key = '_'.join(key)
+
             data[key] = row
 
     return data

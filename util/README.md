@@ -1,18 +1,21 @@
 # Utilities 
 
+## intersection
+
+Intersecion of multiple (>=2) files.
+
 ## csv_grep
 
-grep CSV file, tab-delimited file by default, by exactly matching or query by
-regluar expression. The query patterns could be given from command line or file.
-Column number of key in target file or pattern file is settable.
+Grepping CSV file, tab-delimited file by default, by exactly matching or query by
+regluar expression, multiple keys (indice) supported. The query patterns could be given from command line or file.
 
 ### Usage:
 
 	usage: csv_grep [-h] [-v] [-o [OUTFILE]] [-k KEY] [-H] [-F FS] [-Q QC]
-					[-p [PATTERN]] [-pf [PATTERNFILE]] [-pk [PK]] [-r] [-s] [-n]
+					[-p [PATTERN]] [-pf [PATTERNFILE]] [-pk [PK]] [-r] [-s] [-i]
 					[csvfile [csvfile ...]]
 
-	Grep CSV file
+	Grep CSV file. Multiple keys supported.
 
 	positional arguments:
 	csvfile               Input file(s)
@@ -33,7 +36,7 @@ Column number of key in target file or pattern file is settable.
 	-pk [PK]              Column number of key in pattern file
 	-r, --regexp          Pattern is regular expression
 	-s, --speedup         Delete matched pattern, if you know what it means
-	-n, --invert          Invert match (do not match)
+	-i, --invert          Invert match (do not match)
 
 ### Examples
 
@@ -58,7 +61,7 @@ Find lines that have ID (first column, by default) in (or NOT in) a given ID fil
 	$ cat testdata/data.tab | csv_grep -pf testdata/data.pattern.tab
 	123     134     我
 	
-	$ cat testdata/data.tab | csv_grep -pf testdata/data.pattern.tab -n
+	$ cat testdata/data.tab | csv_grep -pf testdata/data.pattern.tab -i
 	column1 column 2        3rd c
 	str     123     abde
 	245     135     "string with    tab"
@@ -83,3 +86,34 @@ so we add a new column as the key and remove it at last.
 	awk -F"\t" '{print $0"\t"$1""$4""$5""$7}' d.gtf > d1.gtf
 	cat c1.gtf | python3 csv_grep -k 10 -pf d1.gtf -pk 10 | awk 'NF-=1' > common.gtf
 	
+## csv_join
+
+### Usage
+
+    usage: csv_join [-h] [-f1 F1] [-q1 Q1] [-f2 F2] [-q2 Q2] [-of OF] [-t1] [-t2]                           
+                    [-to] [-t] [-k]                                                                         
+                    csvfile1 key1 csvfile2 key2
+    
+    Merge csvfile2 to csvfile1. Multiple keys supported.
+    
+    positional arguments:
+      csvfile1              CSV file 1
+      key1                  Column number of key in csvfile1. Multiple values
+                            shoud be separated by comma.
+      csvfile2              CSV file 2
+      key2                  Column number of key in csvfile2. Multiple values
+                            shoud be separated by comma.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f1 F1                Field separator in csvfile1 [,]
+      -q1 Q1                Quote char in csvfile1 ["]
+      -f2 F2                Field separator in csvfile2 [,]
+      -q2 Q2                Quote char in csvfile2 ["]
+      -of OF                Field separator in csvfile1 [,]
+      -t1                   csvfile1 is table file. Quote char is "\t"
+      -t2                   csvfile1 is table file. Quote char is "\t"
+      -to                   Output quote char is "\t"
+      -t                    abbr for "-t1 -t2 -to"
+      -k, --keep-unmatched  keep rows in CSV file1 not matching row in file2"
+    

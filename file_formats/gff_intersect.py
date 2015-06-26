@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # https://github.com/shenwei356/bio_scripts
+# Author     : Wei Shen
+# Contact    : shenwei356@gmail.com
+# LastUpdate : 2015-06-26
 
 from __future__ import print_function, division
 import argparse
+import os
+import shutil
 import sys
 from collections import defaultdict, Counter
-import operator
 from bx.intervals.intersection import Intersecter, Interval
 
 parser = argparse.ArgumentParser(description="gff intersect",
@@ -13,9 +17,10 @@ parser = argparse.ArgumentParser(description="gff intersect",
 
 parser.add_argument('query', type=str, help='gff file b (query)')
 parser.add_argument('subject', type=str, help='gff file a (subject)')
-
-parser.add_argument("-v", "--verbose", help='verbosely print information',
-                    action="count", default=0)
+parser.add_argument('-e', '--embeded', action='store_true',
+                    help='see what genes (subject) containing in specific regions (query)')
+parser.add_argument('-s', '--split', action='store_true',
+                    help='split results into multiple files')
 
 args = parser.parse_args()
 
@@ -24,20 +29,38 @@ trees = dict()
 with open(args.subject) as fh:
     genome = ''
     for line in fh:
+        if line.isspace() or line[0] == '#':
+            continue
+
         data = line.rstrip().split('\t')
-        g, start, end, strand, product = data[0], int(data[3]), int(data[4]), data[6], data[8]
+        if len(data) != 9:
+            sys.stderr.write('number of columns != 9: {}'.format(line))
+
+        g, start, end, strand = data[0], int(data[3]), int(data[4]), data[6]
         if g != genome:
             genome = g
             trees[genome] = Intersecter()
 
-        if strand == '-':  # complement strand
+        if not args.embeded and strand == '-':  # complement strand
             start, end = -end, -start
-        trees[genome].add_interval(Interval(start, end, value=product))
+        trees[genome].add_interval(Interval(start, end, value=data))
+
+if args.split:
+    outdir = '{}.intersect@{}'.format(os.path.normpath(os.path.basename(args.query)),
+                                   os.path.normpath(os.path.basename(args.subject)))
+    if os.path.exists(outdir):
+        shutil.rmtree(outdir)
+    os.makedirs(outdir)
 
 sys.stderr.write('querying\n')
 with open(args.query) as fh:
     for line in fh:
+        if line.isspace() or line[0] == '#':
+            continue
         data = line.rstrip().split('\t')
+        if len(data) != 9:
+            sys.stderr.write('number of columns != 9: {}'.format(line))
+
         genome, start, end, strand, product = data[0], int(data[3]), int(data[4]), data[6], data[8]
 
         if genome not in trees:
@@ -50,25 +73,36 @@ with open(args.query) as fh:
         overlap_data, stats = list(), Counter()
         for x in overlaps:
             s, e = x.start, x.end
-            if s < 0:  # complement strand
+            if args.embeded:
+                strand2 = '.'
+            elif s > 0:
+                strand2 = '+'
+            else:  # complement strand
                 s, e = -x.end, -x.start
+                strand2 = '-'
 
             overlap, t = 0, ''
             if s <= start:
                 if e >= end:
                     #   start ======== end
                     #     s ------------- e
+                    if args.embeded:
+                        continue
                     overlap = end - start + 1
                     t = 'cover'
                 else:
                     #  start ======== end
                     #   s ------ e
+                    if args.embeded:
+                        continue
                     overlap = e - start + 1
                     t = 'overlap.upstream' if strand == '+' else 'overlap.downstream'
             else:
                 if e >= end:
                     #   start ======== end
                     #           s ------ e
+                    if args.embeded:
+                        continue
                     overlap = end - s + 1
                     t = 'overlap.downstream' if strand == '+' else 'overlap.upstream'
                 else:
@@ -76,18 +110,40 @@ with open(args.query) as fh:
                     #          s --- e
                     overlap = e - s + 1
                     t = 'embed'
-            if strand == '+':
+
+            if args.embeded:
+                frame = '.'
+            elif strand == '+':
                 frame = abs(s - start) % 3
             else:
                 frame = abs(e - end) % 3
 
             stats[t] += 1
-            overlap_data.append(
-                [str(i) for i in [x.value, s, e, overlap, round(100 * overlap / (end - start + 1), 1), t, frame]])
+            if args.embeded:
+                overlap_data.append(x.value)
+            else:
+                overlap_data.append([str(i) for i in
+                                     [s, e, strand2, overlap, round(100 * overlap / (end - start + 1), 1), t, frame,
+                                      x.value[-1]]])
 
-        sys.stdout.write('>' + line)
-        sys.stdout.write('summary: {}\n'.format(stats))
-        sys.stdout.write('\t'.join(['name', 'start', 'end', 'overlap', 'overlap%', 'type', 'frame']) + '\n')
-        for overlap in sorted(overlap_data, key=lambda o: (o[5], o[6], -float(o[4]))):
-            sys.stdout.write('\t'.join(overlap) + '\n')
-        sys.stdout.write('\n')
+        if args.split:
+            fh_out = open(os.path.join(outdir, '{}_{}..{}..{}'.format(genome, start, end, strand)), 'wt')
+            fh_out.write('# {}'.format(line))
+        else:
+            fh_out = sys.stdout
+            fh_out.write('>{}'.format(line))
+
+        if args.embeded:
+            sorted_overlap_data = sorted(overlap_data, key=lambda o: (o[0], o[1]))
+        else:
+            fh_out.write('# summary: {}\n'.format(stats))
+            fh_out.write(
+                '\t'.join(['start', 'end', 'strand', 'overlap', 'overlap%', 'type', 'frame', 'attribute']) + '\n')
+            sorted_overlap_data = sorted(overlap_data, key=lambda o: (o[5], o[6], -float(o[4])))
+
+        for overlap in sorted_overlap_data:
+            fh_out.write('\t'.join(overlap) + '\n')
+        fh_out.write('\n')
+
+        if args.split:
+            fh_out.close()

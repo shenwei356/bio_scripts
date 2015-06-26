@@ -2,7 +2,7 @@
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com
-# LastUpdate : 2015-02-01
+# LastUpdate : 2015-06-26
 
 import argparse
 import csv
@@ -12,8 +12,8 @@ import re
 
 # ===================================[ args ]=================================
 
-parser = argparse.ArgumentParser(description="Grep CSV file", 
-                    epilog="https://github.com/shenwei356/bio_scripts")
+parser = argparse.ArgumentParser(description="Grep CSV file. Multiple keys supported.",
+                                 epilog="https://github.com/shenwei356/bio_scripts")
 
 parser.add_argument('csvfile', nargs='*', type=argparse.FileType('r'),
                     default=sys.stdin, help='Input file(s)')
@@ -22,8 +22,8 @@ parser.add_argument("-v", "--verbose", help='Verbosely print information',
 
 parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'),
                     default=sys.stdout, help='Output file [STDOUT]')
-parser.add_argument("-k", '--key', type=int, default=1,
-                    help='Column number of key in csvfile')
+parser.add_argument("-k", '--key', type=str, default='1',
+                    help='Column number of key in csvfile. Multiple values shoud be separated by comma')
 parser.add_argument("-H", "--ignoretitle", help="Ignore title",
                     action="store_true")
 parser.add_argument("-F", '--fs', type=str, default="\t",
@@ -35,14 +35,14 @@ parser.add_argument('-p', '--pattern', nargs='?', type=str,
                     help='Query pattern')
 parser.add_argument('-pf', '--patternfile', nargs='?', type=str,
                     help='Pattern file')
-parser.add_argument("-pk", type=int, default=1, nargs='?',
-                    help='Column number of key in pattern file')
+parser.add_argument("-pk", type=str, default='1', nargs='?',
+                    help='Column number of key in pattern file. Multiple values shoud be separated by comma')
 
 parser.add_argument("-r", "--regexp", help='Pattern is regular expression',
                     action="store_true")
 parser.add_argument("-d", "--speedup", help='Delete matched pattern, if you know what it means',
                     action="store_true")
-parser.add_argument("-n", "--invert", help="Invert match (do not match)",
+parser.add_argument("-i", "--invert", help="Invert match (do not match)",
                     action="store_true")
 
 args = parser.parse_args()
@@ -54,13 +54,19 @@ elif args.verbose == 1:
     level = logging.INFO
 else:
     level = logging.WARN
-logging.basicConfig(level=level,
-                    format="[%(levelname)s] %(message)s")
+logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
 
 # check args
 if not args.pattern and not args.patternfile:
     logging.error("one or both of option -p and -pf needed")
     sys.exit(1)
+
+
+def parse_key_index(key):
+    if ',' in key:
+        return [int(i) for i in key.split(',')]
+    else:
+        return [int(key)]
 
 # ===================================[ read patterns ]========================
 
@@ -78,17 +84,20 @@ if args.patternfile:
             ncolumn = len(row)
             if ncolumn == 0:
                 continue
-            if ncolumn < args.pk:
-                logging.error(
-                    "-pk ({}) is beyond number of column ({})".format(args.pk, ncolumn))
-                sys.exit(1)
-            elif args.pk < 1:
-                args.pk = 1
 
-            patterns[row[args.pk - 1].strip()] = 1
+            # get key
+            key = list()
+            for k in parse_key_index(args.pk):
+                if ncolumn < k:
+                    logging.error(
+                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.exit(1)
+                key.append(row[k - 1].strip())
+            key = '_'.join(key)
 
-logging.info("load {} patterns: [{}]".format(len(patterns),
-                                             ', '.join(x for x in patterns.keys())))
+            patterns[key] = 1
+
+logging.info("load {} patterns: [{}]".format(len(patterns), ', '.join(x for x in patterns.keys())))
 logging.info("column number of key in pattern: {}".format(args.pk))
 logging.info("Column number of key in csvfile: {}".format(args.key))
 logging.info("Field separator: ({})".format(args.fs))
@@ -128,16 +137,19 @@ for f in args.csvfile:
 
         sum += 1
 
-        nrow = len(row)
-        if nrow == 0:
+        ncolumn = len(row)
+        if ncolumn == 0:
             continue
-        if nrow < args.key:
-            logging.error(
-                "-k ({}) is beyond number of column ({})".format(args.key, nrow))
-            sys.exit(1)
-        elif args.key < 1:
-            args.key = 1
-        key = row[args.key - 1].strip()
+
+        # get key
+        key = list()
+        for k in parse_key_index(args.key):
+            if ncolumn < k:
+                logging.error(
+                    "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                sys.exit(1)
+            key.append(row[k - 1].strip())
+        key = '_'.join(key)
 
         logging.debug("line: {}; key: {}; row: {}".format(sum, key, row))
 
