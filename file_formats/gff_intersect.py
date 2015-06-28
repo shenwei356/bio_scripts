@@ -127,7 +127,7 @@ with open(args.query) as fh:
                                       x.value[-1]]])
 
         if args.split:
-            fh_out = open(os.path.join(outdir, '{}_{}..{}..{}'.format(genome, start, end, strand)), 'wt')
+            fh_out = open(os.path.join(outdir, '{}_{}..{}..{}.gff'.format(genome, start, end, strand)), 'wt')
             fh_out.write('# {}'.format(line))
         else:
             fh_out = sys.stdout

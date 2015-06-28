@@ -6,7 +6,7 @@ import sys
 from collections import defaultdict, Counter
 import pysam
 
-parser = argparse.ArgumentParser(description="bam2gff",
+parser = argparse.ArgumentParser(description="bam2gff, extracting the locations of properly mapping paired ends to GFF format",
                                  epilog="https://github.com/shenwei356/bio_scripts")
 
 parser.add_argument('bamfile', type=str, help='bam file')

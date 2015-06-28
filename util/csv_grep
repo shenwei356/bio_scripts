@@ -40,7 +40,7 @@ parser.add_argument("-pk", type=str, default='1', nargs='?',
 
 parser.add_argument("-r", "--regexp", help='Pattern is regular expression',
                     action="store_true")
-parser.add_argument("-d", "--speedup", help='Delete matched pattern, if you know what it means',
+parser.add_argument("-d", "--speedup", help='Delete matched pattern when matching one record',
                     action="store_true")
 parser.add_argument("-i", "--invert", help="Invert match (do not match)",
                     action="store_true")
@@ -164,6 +164,8 @@ for f in args.csvfile:
         else:
             if key in patterns:  # full match
                 hit = True
+                if args.speedup:
+                    del patterns[k]
 
         if args.invert:
             if hit:
