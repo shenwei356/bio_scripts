@@ -9,6 +9,7 @@ import argparse
 import os
 import shutil
 import sys
+import gzip
 from collections import defaultdict, Counter
 from bx.intervals.intersection import Intersecter, Interval
 
@@ -21,12 +22,24 @@ parser.add_argument('-e', '--embeded', action='store_true',
                     help='see what genes (subject) containing in specific regions (query)')
 parser.add_argument('-s', '--split', action='store_true',
                     help='split results into multiple files')
+parser.add_argument('-eu', '--extend-upstream', type=int, default=0,
+                    help='extend N bases in the upstream [0]')
+parser.add_argument('-ed', '--extend-downstream', type=int, default=0,
+                    help='extend N bases in the downstream [0]')
 
 args = parser.parse_args()
 
+if args.extend_upstream and args.extend_upstream <= 0:
+    sys.stderr.write('value of option --extend-upstream should be greater than 0\n')
+    sys.exit(1)
+
+if args.extend_downstream and args.extend_downstream <= 0:
+    sys.stderr.write('value of option --extend-downstream should be greater than 0\n')
+    sys.exit(1)
+
 sys.stderr.write('building tree\n')
 trees = dict()
-with open(args.subject) as fh:
+with gzip.open(args.subject) if args.subject.endswith('.gz') else open(args.subject) as fh:
     genome = ''
     for line in fh:
         if line.isspace() or line[0] == '#':
@@ -41,19 +54,26 @@ with open(args.subject) as fh:
             genome = g
             trees[genome] = Intersecter()
 
+        if strand == '+':
+            start -= args.extend_upstream
+            end += args.extend_downstream
+        else:
+            start -= args.extend_downstream
+            end += args.extend_upstream
+
         if not args.embeded and strand == '-':  # complement strand
             start, end = -end, -start
         trees[genome].add_interval(Interval(start, end, value=data))
 
 if args.split:
     outdir = '{}.intersect@{}'.format(os.path.normpath(os.path.basename(args.query)),
-                                   os.path.normpath(os.path.basename(args.subject)))
+                                      os.path.normpath(os.path.basename(args.subject)))
     if os.path.exists(outdir):
         shutil.rmtree(outdir)
     os.makedirs(outdir)
 
 sys.stderr.write('querying\n')
-with open(args.query) as fh:
+with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) as fh:
     for line in fh:
         if line.isspace() or line[0] == '#':
             continue
