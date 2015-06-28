@@ -165,7 +165,7 @@ for f in args.csvfile:
             if key in patterns:  # full match
                 hit = True
                 if args.speedup:
-                    del patterns[k]
+                    del patterns[key]
 
         if args.invert:
             if hit:
