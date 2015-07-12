@@ -20,16 +20,18 @@ parser.add_argument('csvfile', nargs='*', type=argparse.FileType('r'),
 parser.add_argument("-v", "--verbose", help='Verbosely print information',
                     action="count", default=0)
 
-parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'),
+parser.add_argument('-o', '--outfile', type=argparse.FileType('w'),
                     default=sys.stdout, help='Output file [STDOUT]')
 parser.add_argument("-k", '--key', type=str, default='1',
                     help='Column number of key in csvfile. Multiple values shoud be separated by comma')
 parser.add_argument("-H", "--ignoretitle", help="Ignore title",
                     action="store_true")
-parser.add_argument("-F", '--fs', type=str, default="\t",
-                    help='Field separator [\\t]')
+parser.add_argument("-F", '--fs', type=str, default=",",
+                    help='Field separator [,]')
 parser.add_argument("-Q", '--qc', type=str, default='"',
                     help='Quote char["]')
+parser.add_argument("-t", action='store_true',
+                    help='Field separator is "\\t". Quote char is "\\t"')
 
 parser.add_argument('-p', '--pattern', nargs='?', type=str,
                     help='Query pattern')
@@ -61,6 +63,8 @@ if not args.pattern and not args.patternfile:
     logging.error("one or both of option -p and -pf needed")
     sys.exit(1)
 
+if args.t:
+    args.fs, args.qc = '\t', '\t'
 
 def parse_key_index(key):
     if ',' in key:
@@ -136,6 +140,9 @@ for f in args.csvfile:
             continue
 
         sum += 1
+
+        if args.speedup and len(patterns) == 0:
+            break
 
         ncolumn = len(row)
         if ncolumn == 0:

@@ -147,7 +147,8 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
                                       x.value[-1]]])
 
         if args.split:
-            fh_out = open(os.path.join(outdir, '{}_{}..{}..{}.gff'.format(genome, start, end, strand)), 'wt')
+            fh_out = open(os.path.join(outdir, '{}_{}..{}..{} {}.gff'.format(genome, start, end, strand, product.replace('/','_'))),
+                          'wt')
             fh_out.write('# {}'.format(line))
         else:
             fh_out = sys.stdout
