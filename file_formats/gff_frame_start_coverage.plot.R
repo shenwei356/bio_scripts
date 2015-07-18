@@ -6,7 +6,7 @@ library(reshape2)
 args <- commandArgs(TRUE)
 if (length(args) != 2) {
   write("\nusage: gff_frame_start_coverage.plot.R infile out.png\n", stderr())
-  quit(status=1)
+  quit(status = 1)
 }
 
 df <- read.csv(args[1], sep = "\t")
@@ -39,4 +39,3 @@ p <- ggplot(df_m) +
   )
 
 ggsave(p, file = args[2], width = 8, height = 4)
-
