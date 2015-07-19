@@ -101,6 +101,12 @@ could remove duplicated records from file or STDIN, by both sequence and header.
 [fasta_locate_motif.pl](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta_locate_motif.pl)
 could find restrict enzyme recognition site or other motif location.
 
+### fasta_gc_skew.py and fasta_gc_skew.plot.R
+
+Sample out:
+
+![GC Skew](sample/gc_skew.png)
+
 ## FASTQ
 
 ### fastq2tab and tab2fastq

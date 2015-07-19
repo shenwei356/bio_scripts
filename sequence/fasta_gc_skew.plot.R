@@ -16,19 +16,19 @@ parser$add_argument("outfile", type = "character",
                     help = "outfile")
 parser$add_argument(
   "-xi", "--x-interval", type = "integer",
-  default = 1000000, help = "x axix interval"
+  default = 1000000, help = "x axix interval [1,000,000]"
 )
 parser$add_argument(
   "-n", type = "integer", default=10,
-  help = "divide the normalized accum_gcskew by n so it looks better"
+  help = "divide the normalized accum_gcskew by n so it looks better [10]"
 )
 parser$add_argument(
   "--width", metavar = "width", type = "integer", default = 20,
-  help = "output image width"
+  help = "output image width [20]"
 )
 parser$add_argument(
   "--height", metavar = "height", type = "integer", default = 5,
-  help = "output image height"
+  help = "output image height [5]"
 )
 args <- parser$parse_args()
 df <- read.csv(args$infile, sep = "\t")
@@ -52,7 +52,7 @@ p <- ggplot(df_m) +
     axis.line = element_line(colour = "black"),
     legend.key = element_blank(),
     legend.title = element_blank(),
-    strip.text = element_blank(),
+    # strip.text = element_blank(),
     strip.background = element_rect(
       colour = "white", fill = "white",
       size = 0.2

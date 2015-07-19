@@ -12,8 +12,8 @@ def parse_args():
                                      epilog="https://github.com/shenwei356/bio_scripts")
 
     parser.add_argument('infile', type=str, help='fasta file')
-    parser.add_argument('-w', '--window', type=int, default=10000, help='window size')
-    parser.add_argument('-s', '--step', type=int, default=200, help='step size')
+    parser.add_argument('-w', '--window', type=int, default=10000, help='window size [10000]')
+    parser.add_argument('-s', '--step', type=int, default=200, help='step size [200]')
 
     args = parser.parse_args()
     return args
