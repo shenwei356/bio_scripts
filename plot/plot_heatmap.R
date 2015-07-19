@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+# https://github.com/shenwei356/bio_scripts
 library(proto)
 library(argparse)
 library(pheatmap)
@@ -47,12 +48,20 @@ parser$add_argument(
 )
 
 parser$add_argument(
-  "-ncr", "--not-cluster-rows", action = "store_false", dest = "not_cluster_rows",
-  help = "do not cluster_rows"
+  "-ncr", "--not-cluster-rows", action = "store_false", 
+  dest = "not_cluster_rows", help = "do not cluster_rows"
 )
 parser$add_argument(
-  "-ncc", "--not-cluster-cols", action = "store_false", dest = "not_cluster_cols",
-  help = "do not cluster_cols"
+  "-ncc", "--not-cluster-cols", action = "store_false", 
+  dest = "not_cluster_cols", help = "do not cluster_cols"
+)
+parser$add_argument(
+  "-c", "--color", metavar = "color", type = "character",
+  default = "RdYlBu", help = "sequential palettes names [RdYlBu]"
+)
+parser$add_argument(
+  "-nrc", "--not-reverse-color-order", dest = "nrcolor",
+  action = "store_true", help = "do not reverse color order"
 )
 
 parser$add_argument(
@@ -88,8 +97,14 @@ parser$add_argument(
 
 args <- parser$parse_args()
 
-if (! (args$scale == "row" || args$scale == "column" || args$scale == "none")){
-  write("value of option -s/--scale should be in [row, column, none]", file=stderr())
+if (args$title == "") {
+  args$title = NA
+}
+
+if (! (args$scale == "row" || args$scale == "column" || 
+       args$scale == "none")){
+  write("value of option -s/--scale should be in [row, column, none]",
+        file = stderr())
   quit(1)
 }
 
@@ -119,6 +134,11 @@ png(
   width = args$width, height = args$height, units = "in", res = 300
 )
 
+palette = colorRampPalette(rev(brewer.pal(9,args$color)))(256)
+if (args$nrcolor) {
+  palette = colorRampPalette(brewer.pal(9,args$color))(256)
+}
+
 pheatmap(
   df,
   main = args$title,
@@ -128,7 +148,7 @@ pheatmap(
   
   treeheight_row = args$treeheight_row,
   treeheight_col = args$treeheight_col,
-  color =  colorRampPalette(rev(brewer.pal(10,"RdYlBu")))(256),
+  color = palette,
   border_color = "white",
   fontsize = args$fontsize,
   fontsize_row = args$fontsize_row,
