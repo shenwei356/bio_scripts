@@ -4,7 +4,6 @@ library(proto)
 library(argparse)
 library(pheatmap)
 library(RColorBrewer)
-library(reshape2)
 
 description <- paste("Plot heatmap. ", 
                      "Infile should be a csv/tsv file with header containing",
