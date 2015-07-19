@@ -28,6 +28,8 @@ parser.add_argument("-H", "--ignoretitle", help="Ignore title",
                     action="store_true")
 parser.add_argument("-F", '--fs', type=str, default=",",
                     help='Field separator [,]')
+parser.add_argument("-Fo", '--fs-out', type=str,
+                    help='Field separator of ouput [same as --fs]')
 parser.add_argument("-Q", '--qc', type=str, default='"',
                     help='Quote char["]')
 parser.add_argument("-t", action='store_true',
@@ -65,6 +67,9 @@ if not args.pattern and not args.patternfile:
 
 if args.t:
     args.fs, args.qc = '\t', '\t'
+
+if not args.fs_out:
+    args.fs_out = args.fs
 
 def parse_key_index(key):
     if ',' in key:
@@ -115,7 +120,7 @@ if args.regexp:
 # ===================================[ read csv ]=============================
 
 cnt, sum = 0, 0
-writer = csv.writer(args.outfile, delimiter=args.fs, quotechar=args.qc,
+writer = csv.writer(args.outfile, delimiter=args.fs_out, quotechar=args.qc,
                     quoting=csv.QUOTE_MINIMAL)
 
 stdinflag = False
