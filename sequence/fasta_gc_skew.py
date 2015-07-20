@@ -14,33 +14,42 @@ def parse_args():
     parser.add_argument('infile', type=str, help='fasta file')
     parser.add_argument('-w', '--window', type=int, default=10000, help='window size [10000]')
     parser.add_argument('-s', '--step', type=int, default=200, help='step size [200]')
+    parser.add_argument('-c', '--circular', action='store_true', help='circular genome')
 
     args = parser.parse_args()
     return args
 
 
-def GC_skew(seq, window=10000, step=200):
+def GC_Skew(seq, window=10000, step=200, circular=False):
     length, cnt = len(seq), 0
-    end = length - window if length > window else 0
+    if circular:
+        end = length - step if length > step else 0
+    else:
+        end = length - window if length > window else 0
     locs = range(0, end + 1, step)
-    skew = np.zeros(len(locs))
+    GC, skew = np.zeros(len(locs)), np.zeros(len(locs))
     for i in locs:
-        s = seq[i:i + window]
+        if i >= length - window:
+            s = '{}{}'.format(seq[i:length], seq[0:window - (length - i)])
+        else:
+            s = seq[i:i + window]
         g, c = s.count('g') + s.count('G'), s.count('c') + s.count('C')
+        GC[cnt] = (g + c) / window
         skew[cnt] = (g - c) / (g + c)
         cnt += 1
-    return skew
+    return GC, skew
 
 
 if __name__ == '__main__':
     args = parse_args()
 
     with open(args.infile) as fh:
-        sys.stdout.write('{}\t{}\t{}\t{}\n'.format('chr', 'loc', 'gcskew', 'accum_gcskew'))
+        sys.stdout.write('{}\t{}\t{}\t{}\t{}\n'.format('chr', 'loc', 'gc', 'gcskew', 'accum_gcskew'))
         for seq in SeqIO.parse(fh, 'fasta'):
             sys.stderr.write('compute gcskew: {}\n'.format(seq.id))
-            gcskew = GC_skew(seq.seq, window=args.window, step=args.step)
+            GC, gcskew = GC_Skew(seq.seq, window=args.window, step=args.step, circular=args.circular)
             acc = 0
-            for i, skew in enumerate(gcskew):
+            for i in range(0, len(GC)):
+                gc, skew = GC[i], gcskew[i]
                 acc += skew
-                sys.stdout.write('{}\t{}\t{:.4f}\t{:.4f}\n'.format(seq.id, i*args.step+1, skew, acc))
+                sys.stdout.write('{}\t{}\t{:.4f}\t{:.4f}\t{:.4f}\n'.format(seq.id, i * args.step + 1, gc, skew, acc))

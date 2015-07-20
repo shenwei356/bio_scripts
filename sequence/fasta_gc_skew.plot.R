@@ -7,7 +7,7 @@ library(ggplot2)
 library(reshape2)
 
 parser <-
-  ArgumentParser(description = "Plot GC Skew with the result produced by fasta_gc_skew.py",
+  ArgumentParser(description = "Plot GC and GC Skew with the result produced by fasta_gc_skew.py",
                  formatter_class = "argparse.RawTextHelpFormatter")
 
 parser$add_argument("infile", type = "character",
@@ -18,10 +18,8 @@ parser$add_argument(
   "-xi", "--x-interval", type = "integer",
   default = 1000000, help = "x axix interval [1,000,000]"
 )
-parser$add_argument(
-  "-n", type = "integer", default=10,
-  help = "divide the normalized accum_gcskew by n so it looks better [10]"
-)
+parser$add_argument("-n", type = "integer", default = 10,
+                    help = "divide the normalized accum_gcskew by n so it looks better [10]")
 parser$add_argument(
   "--width", metavar = "width", type = "integer", default = 20,
   help = "output image width [20]"
@@ -32,7 +30,7 @@ parser$add_argument(
 )
 args <- parser$parse_args()
 df <- read.csv(args$infile, sep = "\t")
-df['accum_gcskew'] = df['accum_gcskew']/max(df['accum_gcskew'])/args$n
+df['accum_gcskew'] = df['accum_gcskew'] / max(df['accum_gcskew']) / args$n
 df_m <- melt(df, id.vars = c("chr", "loc"))
 
 p <- ggplot(df_m) +
@@ -40,10 +38,10 @@ p <- ggplot(df_m) +
   geom_hline(aes(yintercept = 0)) +
   scale_size(range = c(0.1)) +
   facet_grid(chr ~ .) +
-  ylab("GC Skew") +
+  ylab(NULL) +
   xlab(NULL) +
   scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval)) +
-  ggtitle("GC Skew") +
+  ggtitle("GC/GCSkew") +
   theme_bw() +
   theme(
     panel.border = element_blank(),
@@ -52,7 +50,6 @@ p <- ggplot(df_m) +
     axis.line = element_line(colour = "black"),
     legend.key = element_blank(),
     legend.title = element_blank(),
-    # strip.text = element_blank(),
     strip.background = element_rect(
       colour = "white", fill = "white",
       size = 0.2
