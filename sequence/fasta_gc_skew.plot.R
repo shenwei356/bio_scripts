@@ -5,6 +5,7 @@ library(proto)
 library(argparse)
 library(ggplot2)
 library(reshape2)
+library(scales)
 
 parser <-
   ArgumentParser(description = "Plot GC and GC Skew with the result produced by fasta_gc_skew.py",
@@ -28,9 +29,24 @@ parser$add_argument(
   "--height", metavar = "height", type = "integer", default = 5,
   help = "output image height [5]"
 )
+parser$add_argument("-g", "--gc-content", action = "store_true",
+  dest = "gc_content", help = "only plot GC Content")
+parser$add_argument("-s", "--gc-skew", action = "store_true",
+                       dest = "gc_skew", help = "only plot GC Skew")
+
 args <- parser$parse_args()
+
 df <- read.csv(args$infile, sep = "\t")
 df['accum_gcskew'] = df['accum_gcskew'] / max(df['accum_gcskew']) / args$n
+
+if (args$gc_content && !args$gc_skew) {
+  df['gcskew'] = NULL
+  df['accum_gcskew'] = NULL
+}
+if (! args$gc_content && args$gc_skew) {
+  df['gc'] = NULL
+}
+
 df_m <- melt(df, id.vars = c("chr", "loc"))
 
 p <- ggplot(df_m) +
@@ -40,8 +56,8 @@ p <- ggplot(df_m) +
   facet_grid(chr ~ .) +
   ylab(NULL) +
   xlab(NULL) +
-  scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval)) +
-  ggtitle("GC/GCSkew") +
+  scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval), labels = comma) +
+  ggtitle("GC Content/GC Skew") +
   theme_bw() +
   theme(
     panel.border = element_blank(),
