@@ -23,7 +23,7 @@ parser.add_argument("-v", "--verbose", help='Verbosely print information',
 parser.add_argument('-o', '--outfile', type=argparse.FileType('w'),
                     default=sys.stdout, help='Output file [STDOUT]')
 parser.add_argument("-k", '--key', type=str, default='1',
-                    help='Column number of key in csvfile. Multiple values shoud be separated by comma')
+                    help='Column number of key in csvfile. Multiple values shoud be separated by comma [1]')
 parser.add_argument("-H", "--ignoretitle", help="Ignore title",
                     action="store_true")
 parser.add_argument("-F", '--fs', type=str, default=",",
@@ -40,7 +40,7 @@ parser.add_argument('-p', '--pattern', nargs='?', type=str,
 parser.add_argument('-pf', '--patternfile', nargs='?', type=str,
                     help='Pattern file')
 parser.add_argument("-pk", type=str, default='1', nargs='?',
-                    help='Column number of key in pattern file. Multiple values shoud be separated by comma')
+                    help='Column number of key in pattern file. Multiple values shoud be separated by comma [1]')
 
 parser.add_argument("-r", "--regexp", help='Pattern is regular expression',
                     action="store_true")

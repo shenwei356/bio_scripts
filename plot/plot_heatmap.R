@@ -5,10 +5,12 @@ library(argparse)
 library(pheatmap)
 library(RColorBrewer)
 
-description <- paste("Plot heatmap. ", 
-                     "Infile should be a csv/tsv file with header containing",
-                     " column names. Annotation for row is also supported",
-                     ", please put them in the last column.", sep="")
+description <- paste(
+  "Plot heatmap. ",
+  "Infile should be a csv/tsv file with header containing",
+  " column names. Annotation for row is also supported",
+  ", please put them in the last column.", sep = ""
+)
 parser <- ArgumentParser(description = description,
                          formatter_class = "argparse.RawTextHelpFormatter")
 
@@ -47,11 +49,11 @@ parser$add_argument(
 )
 
 parser$add_argument(
-  "-ncr", "--not-cluster-rows", action = "store_false", 
+  "-ncr", "--not-cluster-rows", action = "store_false",
   dest = "not_cluster_rows", help = "do not cluster_rows"
 )
 parser$add_argument(
-  "-ncc", "--not-cluster-cols", action = "store_false", 
+  "-ncc", "--not-cluster-cols", action = "store_false",
   dest = "not_cluster_cols", help = "do not cluster_cols"
 )
 parser$add_argument(
@@ -62,7 +64,10 @@ parser$add_argument(
   "-nrc", "--not-reverse-color-order", dest = "nrcolor",
   action = "store_true", help = "do not reverse color order"
 )
-
+parser$add_argument(
+  "-f", "--format", metavar = "format", type = "character", default = "png",
+  help = "output image format png/tiff/pdf [png]"
+)
 parser$add_argument(
   "--width", metavar = "width", type = "integer", default = 5,
   help = "output image width"
@@ -100,8 +105,8 @@ if (args$title == "") {
   args$title = NA
 }
 
-if (! (args$scale == "row" || args$scale == "column" || 
-       args$scale == "none")){
+if (!(args$scale == "row" || args$scale == "column" ||
+      args$scale == "none")) {
   write("value of option -s/--scale should be in [row, column, none]",
         file = stderr())
   quit(1)
@@ -128,10 +133,32 @@ if (args$with_annotation) {
 
 #-----------------------------------------------------------------------------
 
-png(
-  filename = paste(args$outname, 'png', sep = "."),
-  width = args$width, height = args$height, units = "in", res = 300
-)
+f = tolower(args$format)
+filename = paste(args$outname, f, sep = ".")
+if (f == "png") {
+  pic_format = png
+} else if (f == "tiff") {
+  pic_format = tiff
+} else if (f == "pdf") {
+  pic_format = pdf
+} else if (f == "jpeg") {
+  pic_format = jpeg
+} else {
+  write(paste("you may edit the source to specify the function: ", f, sep =
+                ""), stderr())
+  quit("no", 1)
+}
+
+if (f == "pdf") {
+  pic_format(file = filename,
+             width = args$width, height = args$height)
+} else {
+  pic_format(
+    filename = filename,
+    width = args$width, height = args$height, units = "in", res = 300
+  )
+}
+
 
 palette = colorRampPalette(rev(brewer.pal(9,args$color)))(256)
 if (args$nrcolor) {

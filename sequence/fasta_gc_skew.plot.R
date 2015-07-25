@@ -33,8 +33,16 @@ parser$add_argument("-g", "--gc-content", action = "store_true",
   dest = "gc_content", help = "only plot GC Content")
 parser$add_argument("-s", "--gc-skew", action = "store_true",
                        dest = "gc_skew", help = "only plot GC Skew")
+parser$add_argument(
+  "-t", "--title", metavar = "title", type = "character", 
+  default = "GC Content/GC Skew", help = "title"
+)
 
 args <- parser$parse_args()
+
+if (args$title == "") {
+  args$title = NULL
+}
 
 df <- read.csv(args$infile, sep = "\t")
 df['accum_gcskew'] = df['accum_gcskew'] / max(df['accum_gcskew']) / args$n
@@ -57,7 +65,7 @@ p <- ggplot(df_m) +
   ylab(NULL) +
   xlab(NULL) +
   scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval), labels = comma) +
-  ggtitle("GC Content/GC Skew") +
+  ggtitle(args$title) +
   theme_bw() +
   theme(
     panel.border = element_blank(),
