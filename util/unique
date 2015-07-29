@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+# https://github.com/shenwei356/bio_scripts 
+
+use strict;
+
+my %map = ();
+while (<>){
+    chomp;
+    $map{$_} = 1;
+}
+
+print "$_\n" for keys %map;

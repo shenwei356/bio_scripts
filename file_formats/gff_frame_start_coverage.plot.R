@@ -25,9 +25,8 @@ df <- select(df, X.chr, strand, cnt_f0, cnt_f1, cnt_f2)
 
 df_m <- melt(df, id.vars = c("X.chr", "strand"))
 
-p <- ggplot(df_m) +
-  geom_boxplot(aes(variable, value, fill = strand),
-               position = position_dodge(width = 0.75)) +
+p <- ggplot(df_m, aes(variable, value, fill = strand)) +
+  geom_violin(adjust=1, position = position_dodge(width = 0.75)) +
   scale_x_discrete(labels = c('0','1','2')) +
   xlab('Frame') +
   ylab(ylabel) +
