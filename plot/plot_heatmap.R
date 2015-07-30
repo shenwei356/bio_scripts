@@ -102,7 +102,7 @@ parser$add_argument(
 args <- parser$parse_args()
 
 if (args$title == "") {
-  args$title = NA
+  args$title = NULL
 }
 
 if (!(args$scale == "row" || args$scale == "column" ||

@@ -1,5 +1,37 @@
 # Plot utilities 
 	
+## plot_distribution.R
+
+Plot distribution
+
+Usage
+
+    usage: ./plot_distribution.R [-h] [-bw BINWIDTH] [--xlab XLAB] [--ylab YLAB]
+                                 [--width WIDTH] [--height HEIGHT] [-t title]
+                                 infile outfile
+    
+    Plot distribution.Infile should be a tsv file of two columns (group and "value")
+    
+    positional arguments:
+      infile                infile
+      outfile               outfile
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -bw BINWIDTH, --binwidth BINWIDTH
+                            binwidth
+      --xlab XLAB           xlabel
+      --ylab YLAB           ylabel
+      --width WIDTH         output image width [20]
+      --height HEIGHT       output image height [5]
+      -t title, --title title
+                            title
+    
+Sample output:
+
+![Sample output](data.tsv.dist.png)
+
+
 ## plot_distribution.py
 
 Distribution plot using seaborn
@@ -12,6 +44,7 @@ Example: distribution of sequence length
 Sample output:
 
 ![Sample output](data.txt.png)
+
 
 ## plot_heatmap.R
 

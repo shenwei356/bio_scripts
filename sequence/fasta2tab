@@ -9,7 +9,7 @@ use BioUtil::Util;
 my $usage = q(
 fasta2tab - transform the fasta fromat to two-column table
 
-Usage: $0 [options] [fastafiles...]
+Usage: fasta2tab [options] [fastafiles...]
 Options:    
     -r,   --reverse             Reverse sequence
     -c,   --complement          Complement sequence
