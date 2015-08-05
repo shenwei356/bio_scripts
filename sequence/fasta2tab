@@ -35,7 +35,11 @@ Options:
 
     -l,   --length              Ouput sequence length at another column
     -l2,  --length2             Ouput number of latin-letter in sequence 
-                               at another column
+                                at another column
+    -bc,  --bc STRING[,STRING]  Ouput base content
+                                Examples:
+                                    'GC' :  G+C content,
+                                    'G,C':  G and C, in two column
     -gc,  --gc                  Ouput GC content at another column
 
     -h,   --help                Show this help information
@@ -78,8 +82,8 @@ GetOptions(
 
     'length|l'   => \$$para{len},
     'length2|l2' => \$$para{len2},
+    'bc=s'       => \$$para{bc},
     'gc'         => \$$para{gc},
-
 ) or die $usage;
 
 die $usage if $$para{help};
@@ -163,7 +167,15 @@ for my $file (@files) {
                 print "\t", length $seq2;
             }
         }
-        print "\t", base_content( 'gc', $seq ) if $$para{gc};
+
+        if ($$para{gc}) {
+            print "\t", base_content( 'gc', $seq );
+        } elsif ($$para{bc}) {
+            my @bases = split /,/, $$para{bc};
+            for my $base (@bases) {
+                print "\t", base_content( $base, $seq );
+            }
+        }
         print "\n";
     }
 }
