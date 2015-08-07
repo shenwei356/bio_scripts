@@ -1,5 +1,13 @@
 # Plot utilities 
 	
+## plot_barplot.R
+
+source is not open right now
+
+Sample output:
+
+![Sample output](example/plot_barplot.png)
+	
 ## plot_distribution.R
 
 Plot distribution
@@ -29,7 +37,7 @@ Usage
     
 Sample output:
 
-![Sample output](data.tsv.dist.png)
+![Sample output](example/data.tsv.dist.png)
 
 
 ## plot_distribution.py
@@ -43,7 +51,7 @@ Example: distribution of sequence length
 
 Sample output:
 
-![Sample output](data.txt.png)
+![Sample output](example/data.txt.png)
 
 
 ## plot_heatmap.R
@@ -99,4 +107,4 @@ Usage
                             
 Sample output:
 
-![Sample output](heatmap.png)
+![Sample output](example/heatmap.png)
