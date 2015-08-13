@@ -88,7 +88,7 @@ if args.pattern:
 
 # pattern from pattern file
 if args.patternfile:
-    with open(args.patternfile, newline='') as patternfile:
+    with open(args.patternfile) as patternfile:
         reader = csv.reader(patternfile, delimiter=args.fs, quotechar=args.qc)
         for row in reader:
             ncolumn = len(row)

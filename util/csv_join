@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com
-# LastUpdate : 2015-06-26
+# LastUpdate : 2015-08-13
 
+from __future__ import print_function
 import argparse
 import csv
 import sys
@@ -69,7 +70,7 @@ def parse_args():
 def read_csv_file(file, key_index, fs, qc):
     data = dict()
 
-    with open(file, newline='') as fh:
+    with open(file) as fh:
         reader = csv.reader(fh, delimiter=fs, quotechar=qc)
         for row in reader:
             ncolumn = len(row)
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     file, fs, qc, key_index = args.csvfile1, args.f1, args.q1, args.key1
 
     writer = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
-    with open(file, newline='') as fh:
+    with open(file) as fh:
         reader = csv.reader(fh, delimiter=fs, quotechar=qc)
         for row in reader:
             ncolumn = len(row)
