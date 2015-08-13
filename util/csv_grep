@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com
-# LastUpdate : 2015-06-26
+# LastUpdate : 2015-08-13
 
+from __future__ import print_function
 import argparse
 import csv
 import logging
