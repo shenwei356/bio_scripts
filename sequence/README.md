@@ -112,3 +112,12 @@ Sample out:
 ### fastq2tab and tab2fastq
 
 [*fastq2tab*](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fastq2tab) and [*tab2fastq*](https://github.com/shenwei356/bio_scripts/blob/master/sequence/tab2fastq) are similar to fasta2tab and tab2fasta. It could use to filter fastq with help of [*cvs_grep*](https://github.com/shenwei356/bio_scripts/blob/master/util/csv_grep).
+
+Example: removing contaminate reads
+
+    zcat reads.fq.gz                                \
+       | fastq2tab                                  \
+       | csv_grep -t -pf <(cat idlist) -i -d  \
+       | tab2fastq                                  \
+       | gzip -c                                    \
+       > reads2.fq.gz
