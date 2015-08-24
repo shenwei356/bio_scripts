@@ -117,7 +117,7 @@ Example: removing contaminate reads
 
     zcat reads.fq.gz                                \
        | fastq2tab                                  \
-       | csv_grep -t -pf <(cat idlist) -i -d  \
+       | csv_grep -t -pf <(cat idlist) -i -d        \
        | tab2fastq                                  \
        | gzip -c                                    \
        > reads2.fq.gz
