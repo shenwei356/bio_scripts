@@ -93,6 +93,49 @@ The columns 1,4,5,7 together make up the key of a record.
 
     cat a.gff | csv_grep -t -k 1,4,5,7 -pk 1,4,5,7 -pf b.gff > commom.gff
 	
+## csv_grep2
+    
+    golang version. Faster with multi-threads.
+    
+### Usage:
+    
+    NAME:
+       csv_grep - grep for csv format
+    
+    USAGE:
+       csv_grep [global options] command [command options] [arguments...]
+       
+    VERSION:
+       1.0
+       
+    AUTHOR(S):
+       Wei Shen <https://github.com/shenwei356/bio_scripts> 
+       
+    COMMANDS:
+       help, h      Shows a list of commands or help for one command
+       
+    GLOBAL OPTIONS:
+       -k, --key "1"                column number of key in csvfile. Multiple values shoud be separated by comma [1]
+       -H, --ignoretitle            ignore title
+       --fs ","                     field separator [,]
+       --fs-out                     field separator of ouput [same as --fs]
+       -t, --tab                    field separator is "\t". Quote char is "\t"
+       -p, --pattern                query pattern
+       --pf, --patternfile          pattern file
+       --pk "1"                     column number of key in pattern file. Multiple values shoud be separated by comma [1]
+       --pfs ","                    field separator of pattern file [,]
+       -r, --use-regexp             use regular expression
+       -d, --speedup                delete matched pattern when matching one record
+       -i, --invert                 invert match (do not match)
+       -j, --ncpus "4"              CPU number [4]
+       -c, --chunksize "1000"       chunk size [1000]
+       -o, --outfile                output file [stdout]
+       --vv, --verbose              verbosely print information
+       --help, -h                   show help
+       --version, -v                print the version
+    
+    
+	
 ## csv_join
 
 ### Usage
