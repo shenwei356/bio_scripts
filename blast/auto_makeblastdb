@@ -18,9 +18,9 @@ Options:
     -out
     -title               
 
-    -parse_seqids        [1]
+    -parse_seqids        [false]
 
-    -mask                [0]
+    -mask                [false]
 
     -h                   Show this help information
 
@@ -51,26 +51,30 @@ if ( $$opts{-mask} ) {
     $file_mask_asnb   = "$$opts{-out}_mask.asnb";
     $cmd
         = sprintf
-        "windowmasker -in %s -infmt %s -mk_counts -parse_seqids -out %s",
+        "windowmasker -in %s -infmt %s -mk_counts -out %s",
         quotemeta $$opts{-in}, $$opts{-input_type}, $file_mask_counts;
+    $cmd .= " -parse_seqids" if $$opts{-parse_seqids};
     my $fail = run($cmd);
     die "failed to run:$cmd\n" if $fail;
 
     print STDERR "Makeblastdb...\n";
     $cmd
         = sprintf
-        "windowmasker -in %s -infmt %s -ustat %s -outfmt %s -parse_seqids -out %s",
+        "windowmasker -in %s -infmt %s -ustat %s -outfmt %s -out %s",
         quotemeta $$opts{-in}, $$opts{-input_type}, $file_mask_counts,
-        "maskinfo_asn1_bin", $file_mask_asnb;
+        "maskinfo_asn1_bin", $file_mask_asnb;    
+    $cmd .= " -parse_seqids" if $$opts{-parse_seqids};
+    
     my $fail = run($cmd);
     die "failed to run:$cmd\n" if $fail;
 }
 
 $cmd
     = sprintf
-    "makeblastdb -in %s -input_type %s -dbtype %s -parse_seqids -out %s -title %s",
+    "makeblastdb -in %s -input_type %s -dbtype %s -out %s -title %s",
     quotemeta $$opts{-in}, $$opts{-input_type}, $$opts{-dbtype},
     $$opts{-out}, $$opts{-title};
+$cmd .= " -parse_seqids" if $$opts{-parse_seqids};
 
 if ( $$opts{-mask} ) {
     $cmd .= " -mask_data $file_mask_asnb";

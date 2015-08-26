@@ -64,6 +64,6 @@ if __name__ == '__main__':
         seq_format = args.format
 
     for seq in SeqIO.parse(fh, seq_format):
-        SeqIO.write([SeqRecord(seq.seq.translate(table=args.table), id=seq.id, description='')], sys.stdout, 'fasta')
+        SeqIO.write([SeqRecord(seq.seq.translate(table=args.table), id=seq.id, description=seq.description)], sys.stdout, 'fasta')
 
     fh.close()
