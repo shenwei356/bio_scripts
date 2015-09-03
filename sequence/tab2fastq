@@ -4,5 +4,5 @@
 use strict;
 
 while (<>) {
-    print join( "\n", split( /\t/, $_ ) );
+    print '@'.join( "\n", split( /\t/, $_ ) );
 }

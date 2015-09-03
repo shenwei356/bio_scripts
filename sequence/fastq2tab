@@ -2,11 +2,36 @@
 # https://github.com/shenwei356/bio_scripts
 
 use strict;
+use Getopt::Long;
+
+my $usage = q(
+fastq2tab - transform the fastq fromat to four-column table
+
+Usage: fastq2tab [options] [fastafiles...]
+Options:    
+    -s,   --split             reads id only. no index info
+
+This script is usually used in pair with tab2fastq.
+https://github.com/shenwei356/bio_scripts
+
+);
+
+my $args = {};
+GetOptions(
+    'help|h' => \$$args{help},
+
+    'split|s' => \$$args{split},
+) or die $usage;
+die $usage if $$args{help};
 
 my $line = '';
 while ( my $record = <> ) {
     chomp($record);
     $record =~ s/^\@//;
+
+    if ( $$args{split} ) {
+        $record = ( split / /, $record )[0];
+    }
 
     for ( 1 .. 3 ) {
         $line = <>;
