@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 import sys
+import os
 
 if len(sys.argv) != 2:
-    print "\nUsage: %s  <alignment file>\n" % sys.argv[0]
+    print "\nUsage: %s  <alignment file>\n" % os.path.basename(sys.argv[0])
     sys.exit(1)
 
 blast          = sys.argv[1]

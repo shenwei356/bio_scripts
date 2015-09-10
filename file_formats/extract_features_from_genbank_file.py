@@ -15,7 +15,7 @@ def parse_args():
 
     parser.add_argument('gbkfile', type=str, help='Genbank file')
     parser.add_argument('-t', '--type', type=str, default='CDS',
-                        help='Feature type (CDS tRNA). Multiple values should be separated by comma.')
+                        help='Feature type (CDS tRNA). Multiple values should be separated by comma. "." for any types.')
     outfmt_choices = ['fasta', 'gtf', 'gff']
     parser.add_argument('-f', '--outfmt', type=str, default='fasta',
                         help='Out format, fasta or gtf')
@@ -39,12 +39,12 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
-    types = set(args.type.split(','))
+    types = set(args.type.lower().split(','))
     with open(args.gbkfile) as fh:
         records = SeqIO.parse(fh, "genbank")
         for record in records:
             for f in record.features:
-                if f.type not in types:
+                if '.' not in types and f.type.lower() not in types:
                     continue
 
                 start, end = f.location.start, f.location.end

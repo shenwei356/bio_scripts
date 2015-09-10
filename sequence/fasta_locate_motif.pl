@@ -25,8 +25,6 @@ Attention: In default, motifs are treated as regular expression.
            When option -d given, regular expression may be wrong. 
            For example: "\\w" -> "\\[AT]". In this case you can use "\\.+?"
 
-Example
-
 USAGE
 
 my $args = {};

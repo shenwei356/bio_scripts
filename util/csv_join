@@ -47,10 +47,10 @@ def parse_args():
     parser.add_argument("-to", action='store_true',
                         help='Output quote char is "\\t"')
     parser.add_argument("-t", action='store_true',
-                        help='abbr for "-t1 -t2 -to"')
+                        help='Abbreviation for "-t1 -t2 -to"')
 
     parser.add_argument("-k", "--keep-unmatched", action='store_true',
-                        help='keep rows in CSV file1 not matching row in file2"')
+                        help='Keep rows in CSV file1 not matching row in file2"')
 
     args = parser.parse_args()
 
