@@ -22,7 +22,7 @@ parser$add_argument("-H", "--header", action = "store_false",
                     dest = "header", help = "header")
 parser$add_argument(
   "-F", "--field-seperator", metavar = "field_seperator", type = "character",
-  default = "\t", help = "field seperator"
+  default = "\t", help = "field seperator [\"\\t\"]"
 )
 parser$add_argument(
   "-a", "--with-annot", action = "store_true", dest = "with_annotation",
@@ -70,31 +70,31 @@ parser$add_argument(
 )
 parser$add_argument(
   "--width", metavar = "width", type = "integer", default = 5,
-  help = "output image width"
+  help = "output image width [5]"
 )
 parser$add_argument(
   "--height", metavar = "height", type = "integer", default = 5,
-  help = "output image height"
+  help = "output image height [5]"
 )
 parser$add_argument(
   "-thr", "--treeheight_row", metavar = "treeheight_row", type = "integer",
-  default = 30, help = "treeheight_row"
+  default = 30, help = "treeheight_row [30]"
 )
 parser$add_argument(
   "-thc", "--treeheight_col", metavar = "treeheight_col", type = "integer",
-  default = 30, help = "treeheight_col"
+  default = 30, help = "treeheight_col [30]"
 )
 parser$add_argument(
   "-fo", "--fontsize", metavar = "fontsize", type = "integer",
-  default = 10, help = "fontsize"
+  default = 10, help = "fontsize [10]"
 )
 parser$add_argument(
   "-fr", "--fontsize_row", metavar = "fontsize_row", type = "integer",
-  default = 10, help = "fontsize_row"
+  default = 10, help = "fontsize_row [10]"
 )
 parser$add_argument(
   "-fc", "--fontsize_col", metavar = "fontsize_col", type = "integer",
-  default = 10, help = "fontsize_col"
+  default = 10, help = "fontsize_col [10]"
 )
 
 #-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ parser$add_argument(
 args <- parser$parse_args()
 
 if (args$title == "") {
-  args$title = NULL
+  args$title = ""
 }
 
 if (!(args$scale == "row" || args$scale == "column" ||

@@ -50,7 +50,7 @@ parser$add_argument(
 args <- parser$parse_args()
 
 if (args$title == "") {
-  args$title = NULL
+  args$title = ""
 }
 
 #-----------------------------------------------------------------------------

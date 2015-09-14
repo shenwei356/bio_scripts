@@ -413,13 +413,6 @@ func string_of_one_char_to_rune(str string) rune {
 	return []rune(str)[0]
 }
 
-func check_key_index(index string) {
-	if !key_index_pattern.MatchString(index) {
-		fmt.Fprintln(os.Stderr, "invalid key index")
-		os.Exit(1)
-	}
-}
-
 func get_key_index(index string) (indice []int) {
 	if !key_index_pattern.MatchString(index) {
 		fmt.Fprintln(os.Stderr, "invalid key index")
