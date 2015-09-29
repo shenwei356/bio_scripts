@@ -16,7 +16,7 @@ import (
 	"github.com/shenwei356/pmap"
 )
 
-var key_index_pattern *regexp.Regexp = regexp.MustCompile(`^[\d,]+$`)
+var keyIndexPattern = regexp.MustCompile(`^[\d,]+$`)
 
 func main() {
 	app := cli.NewApp()
@@ -128,11 +128,11 @@ func main() {
 
 		ignoretitle := c.Bool("ignoretitle")
 
-		key_index := get_key_index(c.String("key"))
-		pk_index := get_key_index(c.String("pk"))
+		keyIndex := getKeyIndex(c.String("key"))
+		pkIndex := getKeyIndex(c.String("pk"))
 
-		fs := string_of_one_char_to_rune(c.String("fs"))
-		pfs := string_of_one_char_to_rune(c.String("pfs"))
+		fs := stringOfOneCharToRune(c.String("fs"))
+		pfs := stringOfOneCharToRune(c.String("pfs"))
 		if c.Bool("tab") {
 			fs = []rune("\t")[0]
 			pfs = []rune("\t")[0]
@@ -141,7 +141,7 @@ func main() {
 		if c.String("fs-out") == "" {
 			fsout = fs
 		} else {
-			fsout = string_of_one_char_to_rune(c.String("fs-out"))
+			fsout = stringOfOneCharToRune(c.String("fs-out"))
 		}
 
 		// patterns
@@ -151,7 +151,7 @@ func main() {
 		}
 		patternfile := c.String("patternfile")
 		if patternfile != "" {
-			for _, pattern := range read_patterns(patternfile, pfs, pk_index) {
+			for _, pattern := range readPatterns(patternfile, pfs, pkIndex) {
 				patterns.Set(pattern, nil)
 			}
 		}
@@ -163,7 +163,7 @@ func main() {
 		if useregexp {
 			var wg sync.WaitGroup
 			tokens := make(chan int, ncpus)
-			for k, _ := range patterns.Map {
+			for k := range patterns.Map {
 				tokens <- 1
 				wg.Add(1)
 				key, _ := k.(string)
@@ -174,7 +174,7 @@ func main() {
 					}()
 					r, err := regexp.Compile(key)
 					if err != nil {
-						fmt.Fprintf(os.Stderr, "fail to compile regexp: %s\n", k)
+						fmt.Fprintf(os.Stderr, "fail to compile regexp: %s\n", key)
 						os.Exit(1)
 					}
 					m.Set(key, r)
@@ -210,9 +210,9 @@ func main() {
 		done := make(chan int)
 		go func() {
 			buffer := make(map[int][]Record, ncpus)
-			var id int = 0
+			var id int
 			for chunk := range out {
-				buffer[chunk.Id] = chunk.Data
+				buffer[chunk.ID] = chunk.Data
 				if _, ok := buffer[id]; ok {
 					for _, record := range buffer[id] {
 						writter.Write(record.Content)
@@ -224,7 +224,7 @@ func main() {
 			// sort by id
 			ids := make([]int, len(buffer))
 			i := 0
-			for id, _ := range buffer {
+			for id := range buffer {
 				ids[i] = id
 				i++
 			}
@@ -262,7 +262,7 @@ func main() {
 				defer fh.Close()
 			}
 
-			ch := csv_reader(fh, fs, key_index, chunksize, ncpus, ignoretitle)
+			ch := CSVReader(fh, fs, keyIndex, chunksize, ncpus, ignoretitle)
 
 			for chunk := range ch {
 				tokens <- 1
@@ -272,7 +272,7 @@ func main() {
 						wg.Done()
 						<-tokens
 					}()
-					chunk2 := check_chunk(chunk, patterns, useregep, invert, speedup)
+					chunk2 := checkChunk(chunk, patterns, useregep, invert, speedup)
 					out <- chunk2
 				}(chunk, patterns, useregexp, invert, speedup)
 			}
@@ -285,8 +285,8 @@ func main() {
 	app.Run(os.Args)
 }
 
-func check_chunk(chunk Chunk, patterns *pmap.ParallelMap, useregep bool, invert bool, speedup bool) Chunk {
-	chunk2 := Chunk{chunk.Id, make([]Record, 0)}
+func checkChunk(chunk Chunk, patterns *pmap.ParallelMap, useregep bool, invert bool, speedup bool) Chunk {
+	chunk2 := Chunk{chunk.ID, make([]Record, 0)}
 	for _, record := range chunk.Data {
 		hit := false
 		if useregep {
@@ -322,8 +322,8 @@ func check_chunk(chunk Chunk, patterns *pmap.ParallelMap, useregep bool, invert 
 	return chunk2
 }
 
-func read_patterns(file string, fs rune, key_index []int) []string {
-	patterns := make([]string, 0)
+func readPatterns(file string, fs rune, keyIndex []int) []string {
+	var patterns []string
 
 	fh, err := os.Open(file)
 	if err != nil {
@@ -332,7 +332,7 @@ func read_patterns(file string, fs rune, key_index []int) []string {
 	}
 	defer fh.Close()
 
-	ch := csv_reader(fh, fs, key_index, 1000, 1, false)
+	ch := CSVReader(fh, fs, keyIndex, 1000, 1, false)
 	for {
 		select {
 		case chunk := <-ch:
@@ -344,27 +344,29 @@ func read_patterns(file string, fs rune, key_index []int) []string {
 			}
 		}
 	}
-	return patterns
 }
 
+// Record object
 type Record struct {
 	Key     string
 	Content []string
 }
 
+// Chunk object contains Multiple Records
 type Chunk struct {
-	Id   int
+	ID   int
 	Data []Record
 }
 
-func csv_reader(file *os.File, fs rune, key_index []int, chunksize int, buffersize int, ignoretitle bool) chan Chunk {
+// CSVReader function
+func CSVReader(file *os.File, fs rune, keyIndex []int, chunksize int, buffersize int, ignoretitle bool) chan Chunk {
 	ch := make(chan Chunk, buffersize)
 	go func() {
 		defer func() {
 			close(ch)
 		}()
-		var id int = 0
-		chunkdata := make([]Record, 0)
+		var id int
+		var chunkdata []Record
 
 		reader := csv.NewReader(file)
 		reader.Comma = fs
@@ -383,8 +385,8 @@ func csv_reader(file *os.File, fs rune, key_index []int, chunksize int, buffersi
 				continue
 			}
 			n := len(record)
-			keys := make([]string, 0)
-			for _, i := range key_index {
+			var keys []string
+			for _, i := range keyIndex {
 				if i > n {
 					fmt.Fprintf(os.Stderr, "key index (%d) is beyond number of column (%d)\n", i, n)
 					os.Exit(1)
@@ -395,7 +397,7 @@ func csv_reader(file *os.File, fs rune, key_index []int, chunksize int, buffersi
 			if len(chunkdata) == chunksize {
 				ch <- Chunk{id, chunkdata}
 				chunkdata = make([]Record, 0)
-				id += 1
+				id++
 			}
 		}
 		if len(chunkdata) > 0 {
@@ -405,7 +407,7 @@ func csv_reader(file *os.File, fs rune, key_index []int, chunksize int, buffersi
 	return ch
 }
 
-func string_of_one_char_to_rune(str string) rune {
+func stringOfOneCharToRune(str string) rune {
 	if len(str) != 1 {
 		fmt.Fprintf(os.Stderr, "string (%s) should be single character\n", str)
 		os.Exit(1)
@@ -413,8 +415,8 @@ func string_of_one_char_to_rune(str string) rune {
 	return []rune(str)[0]
 }
 
-func get_key_index(index string) (indice []int) {
-	if !key_index_pattern.MatchString(index) {
+func getKeyIndex(index string) (indice []int) {
+	if !keyIndexPattern.MatchString(index) {
 		fmt.Fprintln(os.Stderr, "invalid key index")
 		os.Exit(1)
 	}
