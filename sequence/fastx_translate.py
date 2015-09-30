@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
+from __future__ import print_function
 import argparse
 import logging
 import os
@@ -29,13 +31,13 @@ def parse_args():
 
     args = parser.parse_args()
     if not (args.stdin or args.infile):
-        print("option --stdin or -i should be given", file=sys.stderr)
+        sys.stderr.write("option --stdin or -i should be given\n")
         sys.exit(1)
     if args.format and not args.format in ['fasta', 'fastq']:
-        print("option -f | --format should be 'fasta' or 'fastq'", file=sys.stderr)
+        sys.stderr.write("option -f | --format should be 'fasta' or 'fastq'\n")
         sys.exit(1)
     if args.stdin and not args.format:
-        print("option -f | --format should be given when --stdin is set.", file=sys.stderr)
+        sys.stderr.write("option -f | --format should be given when --stdin is set.\n")
         sys.exit(1)
 
     return args

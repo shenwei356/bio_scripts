@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
+from __future__ import print_function
 import argparse
 import logging
 import os
@@ -25,7 +27,7 @@ def parse_args():
 
     args = parser.parse_args()
     if not ( args.stdin or args.infile ):
-        print("option --stdin or -i should be given", file=sys.stderr)
+        sys.stderr.write("option --stdin or -i should be given\n")
         sys.exit(1)
 
     return args
@@ -35,7 +37,7 @@ def seq_iter(file):
     if file:
         found = re.search(r'(?i)(fasta|fa|fastq|fq)(.gz)?$', file)
         if not found:
-            print("invalid file name suffix.\nfile name should like this: infile.[fasfa|fa|fastq|fq][.gz]", file=sys.stderr)
+            sys.stderr.write("invalid file name suffix.\nfile name should like this: infile.[fasfa|fa|fastq|fq][.gz]\n")
             sys.exit(1)
         seq_format, is_gz = found.groups()
         if seq_format == 'fa':

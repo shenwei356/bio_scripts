@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
 from __future__ import division
 import sys

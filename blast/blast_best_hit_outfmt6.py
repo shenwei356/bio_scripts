@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 # from https://github.com/jameslz/benchmark
 import sys
 
@@ -20,4 +21,4 @@ with open(blast, 'r') as fp:
             if init != item[0]:
                 if evalue <= max_evalue and bit_score >= min_bit_score:
                     print line.strip()
-                init = item[0] 
+                init = item[0]

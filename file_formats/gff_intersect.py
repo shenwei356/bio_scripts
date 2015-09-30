@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com

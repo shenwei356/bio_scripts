@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import sys
 import os
@@ -16,4 +17,4 @@ with open(blast, 'r') as fp:
             item         = line.strip().split("\t")
             if init != item[0]:
                 print line.strip()
-                init = item[0] 
+                init = item[0]

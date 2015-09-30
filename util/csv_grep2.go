@@ -203,7 +203,6 @@ func main() {
 		// writter
 		writter := csv.NewWriter(fhout)
 		writter.Comma = fsout
-		// writter.LazyQuotes = true
 
 		// reducer
 		out := make(chan Chunk, ncpus)
