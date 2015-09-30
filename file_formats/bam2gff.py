@@ -4,7 +4,8 @@
 
 import argparse
 import sys
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
+
 import pysam
 
 parser = argparse.ArgumentParser(

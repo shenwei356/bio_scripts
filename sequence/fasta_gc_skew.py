@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
 from __future__ import division
-import sys
+
 import argparse
-from Bio import SeqIO
+import sys
+
 import numpy as np
+from Bio import SeqIO
 
 
 def parse_args():

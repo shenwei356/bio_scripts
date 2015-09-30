@@ -6,11 +6,13 @@
 # LastUpdate : 2015-08-24
 
 from __future__ import print_function
+
 import argparse
 import csv
 import logging
-import sys
 import re
+import sys
+
 
 # ===================================[ args ]=================================
 

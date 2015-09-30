@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
 from __future__ import print_function
+
 import argparse
+import gzip
 import logging
 import os
-import sys
-import gzip
 import re
+import sys
+
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord

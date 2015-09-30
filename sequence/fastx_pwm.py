@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 # https://github.com/shenwei356/bio_scripts
 from __future__ import print_function
+
 import argparse
+import gzip
 import logging
 import os
-import sys
-import gzip
 import re
-from Bio import motifs
-from Bio import SeqIO
+import sys
+
+from Bio import SeqIO, motifs
 from Bio.Seq import Seq
 
 

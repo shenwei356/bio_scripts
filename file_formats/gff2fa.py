@@ -3,10 +3,12 @@
 # https://github.com/shenwei356/bio_scripts
 
 from __future__ import print_function
+
 import argparse
-import sys
 import gzip
+import sys
 from collections import defaultdict
+
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 

@@ -5,13 +5,15 @@
 # Contact    : shenwei356@gmail.com
 # LastUpdate : 2015-07-17
 
-from __future__ import print_function, division
+from __future__ import division, print_function
+
 import argparse
-import os
-import sys
 import gzip
-from collections import defaultdict, Counter
+import os
 import pickle
+import sys
+from collections import Counter, defaultdict
+
 import numpy as np
 
 parser = argparse.ArgumentParser(description="gff frame start coverage",

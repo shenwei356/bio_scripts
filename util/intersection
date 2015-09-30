@@ -3,6 +3,7 @@
 # https://github.com/shenwei356/bio_scripts
 
 from __future__ import print_function
+
 import sys
 
 if len(sys.argv) <= 2:

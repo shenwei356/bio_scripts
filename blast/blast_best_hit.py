@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
 
 if len(sys.argv) != 2:
     print "\nUsage: %s  <alignment file>\n" % os.path.basename(sys.argv[0])

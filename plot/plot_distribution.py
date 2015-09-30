@@ -1,14 +1,14 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 
 import argparse
-import sys
 import re
+import sys
 
-import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 
 parser = argparse.ArgumentParser(description='Plot distribution',
                                  epilog="https://github.com/shenwei356/bio_scripts")
