@@ -3,14 +3,14 @@
 # https://github.com/shenwei356/bio_scripts
 # Author     : Wei Shen
 # Contact    : shenwei356@gmail.com
-# LastUpdate : 2015-08-13
+# LastUpdate : 2015-10-04
 
 from __future__ import print_function
 
 import argparse
 import csv
-import logging
 import sys
+from collections import defaultdict
 
 
 def parse_key_index(key):
@@ -18,55 +18,6 @@ def parse_key_index(key):
         return [int(i) for i in key.split(',')]
     else:
         return [int(key)]
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Merge csvfile2 to csvfile1. Multiple keys supported.",
-                                     epilog="https://github.com/shenwei356/bio_scripts")
-
-    parser.add_argument('csvfile1', type=str, help='CSV file 1')
-    parser.add_argument("key1", type=str,
-                        help='Column number of key in csvfile1. Multiple values shoud be separated by comma.')
-    parser.add_argument('csvfile2', type=str, help='CSV file 2')
-    parser.add_argument("key2", type=str,
-                        help='Column number of key in csvfile2. Multiple values shoud be separated by comma.')
-
-    parser.add_argument("-f1", type=str, default=",",
-                        help='Field separator in csvfile1 [,]')
-    parser.add_argument("-q1", type=str, default='"',
-                        help='Quote char in csvfile1 ["]')
-    parser.add_argument("-f2", type=str, default=",",
-                        help='Field separator in csvfile2 [,]')
-    parser.add_argument("-q2", type=str, default='"',
-                        help='Quote char in csvfile2 ["]')
-    parser.add_argument("-of", type=str, default=",",
-                        help='Field separator in csvfile1 [,]')
-
-    parser.add_argument("-t1", action='store_true',
-                        help='csvfile1 is table file. Quote char is "\\t"')
-    parser.add_argument("-t2", action='store_true',
-                        help='csvfile1 is table file. Quote char is "\\t"')
-    parser.add_argument("-to", action='store_true',
-                        help='Output quote char is "\\t"')
-    parser.add_argument("-t", action='store_true',
-                        help='Abbreviation for "-t1 -t2 -to"')
-
-    parser.add_argument("-k", "--keep-unmatched", action='store_true',
-                        help='Keep rows in CSV file1 not matching row in file2"')
-
-    args = parser.parse_args()
-
-    if args.t:
-        args.f1, args.f2, args.of = '\t', '\t', '\t'
-    else:
-        if args.t1:
-            args.f1 = '\t'
-        if args.t2:
-            args.f2 = '\t'
-        if args.to:
-            args.of = '\t'
-
-    return args
 
 
 def read_csv_file(file, key_index, fs, qc):
@@ -82,44 +33,113 @@ def read_csv_file(file, key_index, fs, qc):
             key = list()
             for k in parse_key_index(key_index):
                 if ncolumn < k:
-                    logging.error(
-                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.stderr.write(
+                        "key ({}) is beyond number of column ({})\n".format(
+                            k, ncolumn))
                     sys.exit(1)
                 key.append(row[k - 1].strip())
             key = '_'.join(key)
-
             data[key] = row
-
     return data
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Merge CSV files. Multiple keys supported. v2.0",
+        epilog="https://github.com/shenwei356/bio_scripts")
 
+    parser.add_argument('csvfile', type=str, nargs='+', help='CSV files')
+    parser.add_argument(
+        "-k",
+        "--key",
+        type=str,
+        nargs='*',
+        help='column number of key in csvfile. [1 for all files]')
+
+    parser.add_argument("-f",
+                        type=str,
+                        default=",",
+                        help='field separator [,]')
+    parser.add_argument("-q", type=str, default='"', help='quote char ["]')
+    parser.add_argument("-of",
+                        type=str,
+                        default=",",
+                        help='field separator [,]')
+
+    parser.add_argument("-t",
+                        action='store_true',
+                        help='quote char in all files are "\\t"')
+
+    parser.add_argument("-s",
+                        "--simplify",
+                        action='store_true',
+                        help='simplify the result, by removing keys')
+    parser.add_argument("-keep",
+                        "--keep-unmatched",
+                        action='store_true',
+                        help='keep unmatched record in PREVIOUS files')
+
+    args = parser.parse_args()
+
+    if len(args.csvfile) < 2:
+        sys.stderr.write('at least 2 csvfile should be given.\n')
+        sys.exit(1)
+    if not args.key or len(args.key) == 0:
+        args.key = ['1'] * len(args.csvfile)
+    if len(args.csvfile) != len(args.key):
+        sys.stderr.write('length of csvfile and key unequal.\n')
+        sys.exit(1)
+    if args.t:
+        args.f, args.of = '\t', '\t'
+
+    return args
+
+
+if __name__ == '__main__':
     args = parse_args()
 
-    data = read_csv_file(args.csvfile2, args.key2, args.f2, args.q2)
+    result = defaultdict(list)
 
-    file, fs, qc, key_index = args.csvfile1, args.f1, args.q1, args.key1
+    # first file
+    data = read_csv_file(args.csvfile[0], args.key[0], args.f, args.q)
+    for key, record in data.items():
+        result[key].append(record)
 
-    writer = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
-    with open(file) as fh:
-        reader = csv.reader(fh, delimiter=fs, quotechar=qc)
-        for row in reader:
-            ncolumn = len(row)
-            if ncolumn == 0:
+    # other files
+    mark = set()  # mark for key missing in some file
+    i = 1  # current number of files
+    for file, key_index in zip(args.csvfile[1:], args.key[1:]):
+        data = read_csv_file(file, key_index, args.f, args.q)
+        for key, record in data.items():
+            ncol = len(record)
+            if key in result:
+                if args.simplify:
+                    record = [record[j] for j in range(len(record))
+                              if j + 1 not in parse_key_index(key_index)]
+                result[key].append(record)
+
+        # for option --keep-unmatched
+        i += 1
+        for key, records in result.items():
+            if len(records) != i:
+                mark.add(key)
+                record = [''] * ncol
+                if args.simplify:
+                    record = [''] * (ncol - len(parse_key_index(key_index)))
+                result[key].append(record)
+
+    # wirte results
+    writer = csv.writer(sys.stdout,
+                        delimiter=args.of,
+                        quotechar=args.q,
+                        quoting=csv.QUOTE_MINIMAL)
+
+    for key in sorted(result.keys()):
+        if key in mark:
+            if not args.keep_unmatched:
                 continue
 
-            key = list()
-            for k in parse_key_index(key_index):
-                if ncolumn < k:
-                    logging.error(
-                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
-                    sys.exit(1)
-                key.append(row[k - 1].strip())
-            key = '_'.join(key)
-
-            if key in data:
-                writer.writerow(row + data[key])
-            elif args.keep_unmatched:
-                writer.writerow(row)
+        row = result[key][0]
+        for record in result[key][1:]:
+            row.extend(record)
+        writer.writerow(row)

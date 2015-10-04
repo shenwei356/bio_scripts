@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# https://github.com/shenwei356/bio_scripts
+# Author     : Wei Shen
+# Contact    : shenwei356@gmail.com
+# LastUpdate : 2015-08-13
+
+from __future__ import print_function
+
+import argparse
+import csv
+import logging
+import sys
+
+
+def parse_key_index(key):
+    if ',' in key:
+        return [int(i) for i in key.split(',')]
+    else:
+        return [int(key)]
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Merge csvfile2 to csvfile1. Multiple keys supported.",
+                                     epilog="https://github.com/shenwei356/bio_scripts")
+
+    parser.add_argument('csvfile1', type=str, help='CSV file 1')
+    parser.add_argument("key1", type=str,
+                        help='Column number of key in csvfile1. Multiple values shoud be separated by comma.')
+    parser.add_argument('csvfile2', type=str, help='CSV file 2')
+    parser.add_argument("key2", type=str,
+                        help='Column number of key in csvfile2. Multiple values shoud be separated by comma.')
+
+    parser.add_argument("-f1", type=str, default=",",
+                        help='Field separator in csvfile1 [,]')
+    parser.add_argument("-q1", type=str, default='"',
+                        help='Quote char in csvfile1 ["]')
+    parser.add_argument("-f2", type=str, default=",",
+                        help='Field separator in csvfile2 [,]')
+    parser.add_argument("-q2", type=str, default='"',
+                        help='Quote char in csvfile2 ["]')
+    parser.add_argument("-of", type=str, default=",",
+                        help='Field separator in output [,]')
+
+    parser.add_argument("-t1", action='store_true',
+                        help='csvfile1 is table file. Quote char is "\\t"')
+    parser.add_argument("-t2", action='store_true',
+                        help='csvfile1 is table file. Quote char is "\\t"')
+    parser.add_argument("-to", action='store_true',
+                        help='Output quote char is "\\t"')
+    parser.add_argument("-t", action='store_true',
+                        help='Abbreviation for "-t1 -t2 -to"')
+
+    parser.add_argument("-k", "--keep-unmatched", action='store_true',
+                        help='Keep rows in CSV file1 not matching row in file2"')
+
+    args = parser.parse_args()
+
+    if args.t:
+        args.f1, args.f2, args.of = '\t', '\t', '\t'
+    else:
+        if args.t1:
+            args.f1 = '\t'
+        if args.t2:
+            args.f2 = '\t'
+        if args.to:
+            args.of = '\t'
+
+    return args
+
+
+def read_csv_file(file, key_index, fs, qc):
+    data = dict()
+
+    with open(file) as fh:
+        reader = csv.reader(fh, delimiter=fs, quotechar=qc)
+        for row in reader:
+            ncolumn = len(row)
+            if ncolumn == 0:
+                continue
+
+            key = list()
+            for k in parse_key_index(key_index):
+                if ncolumn < k:
+                    logging.error(
+                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.exit(1)
+                key.append(row[k - 1].strip())
+            key = '_'.join(key)
+
+            data[key] = row
+
+    return data
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
+
+    args = parse_args()
+
+    data = read_csv_file(args.csvfile2, args.key2, args.f2, args.q2)
+
+    file, fs, qc, key_index = args.csvfile1, args.f1, args.q1, args.key1
+
+    writer = csv.writer(sys.stdout, delimiter=args.of, quotechar=qc, quoting=csv.QUOTE_MINIMAL)
+    with open(file) as fh:
+        reader = csv.reader(fh, delimiter=fs, quotechar=qc)
+        for row in reader:
+            ncolumn = len(row)
+            if ncolumn == 0:
+                continue
+
+            key = list()
+            for k in parse_key_index(key_index):
+                if ncolumn < k:
+                    logging.error(
+                        "key ({}) is beyond number of column ({})".format(k, ncolumn))
+                    sys.exit(1)
+                key.append(row[k - 1].strip())
+            key = '_'.join(key)
+
+            if key in data:
+                writer.writerow(row + data[key])
+            elif args.keep_unmatched:
+                writer.writerow(row)

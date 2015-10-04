@@ -10,7 +10,7 @@ my $usage = q(
 fasta2tab - transform the fasta fromat to two-column table
 
 Usage: fasta2tab [options] [fastafiles...]
-Options:    
+Options:
     -r,   --reverse             Reverse sequence
     -c,   --complement          Complement sequence
     -rc,  --reversecomplement   Reversecomplement
@@ -18,7 +18,7 @@ Options:
                                 Examples:
                                     seq         ACGAGACGTA
                                     index       1234567890
-                                    
+
                                      option      subseq
                                     --------------------
                                     -sub  2,7    CGAGAC
@@ -34,7 +34,7 @@ Options:
     -uc,  --uppercase           Uppercase
 
     -l,   --length              Ouput sequence length at another column
-    -l2,  --length2             Ouput number of latin-letter in sequence 
+    -l2,  --length2             Ouput number of latin-letter in sequence
                                 at another column
     -bc,  --bc STRING[,STRING]  Ouput base content
                                 Examples:
@@ -94,7 +94,7 @@ parameter of -sub not correct.
 examples:
     seq         ACGAGACGTA
     index       1234567890
-    
+
      option      subseq
     --------------------
     -sub  2,7    CGAGAC

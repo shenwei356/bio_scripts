@@ -12,7 +12,7 @@ tab2fasta - transfrom column table to fasta fromat
 Usage: $0 [options] [tablefile...]
 
 Options:
-    
+
     -l,  --linelength          Output line length
     -h,  --help                Show this help information
 
