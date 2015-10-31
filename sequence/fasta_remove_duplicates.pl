@@ -16,7 +16,7 @@ Remove duplicated fasta records
 
 Usage: $0 [options] [fastafiles...]
 Options:
-    
+
    -n   Comparing by header.
    -s   Comparing by sequence.
    -i   Ignore case.
@@ -25,7 +25,7 @@ Options:
    -h   Show this help information.
 
 Examples:
-    
+
     fasta_remove_duplicates.pl -s -i seq1.fa seq2.fa > uniq.fa
     fasta_remove_duplicates.pl -n seq*.fa > uniq.fa
     zcat seq.fa.gz | fasta_remove_duplicates.pl -s -i > uniq.fa
@@ -51,6 +51,9 @@ GetOptions(
 ) or die $usage;
 
 die $usage if $help;
+if ($linelength <= 0 ){
+    die sprintf "value of -l (%d) should be greatter than 0\n", $linelength;
+}
 
 # get the file list
 my @files = file_list_from_argv(@ARGV);
