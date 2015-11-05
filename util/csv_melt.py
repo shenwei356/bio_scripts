@@ -50,7 +50,7 @@ if args.append:
     if not re.search(pattern, args.append):
         sys.stderr.write("bad format for option -a: {}".format(args.append))
         sys.exit(1)
-    colname, colvalue = re.findall(pattern, args.append)[0]))
+    colname, colvalue = re.findall(pattern, args.append)[0]
 
 keys = list()
 if ',' in args.key:
