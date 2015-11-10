@@ -6,6 +6,7 @@ library(argparse)
 library(ggplot2)
 library(reshape2)
 library(scales)
+library(ggthemes)
 
 parser <-
   ArgumentParser(description = "Plot GC and GC Skew with the result produced by fasta_gc_skew.py",
@@ -61,6 +62,7 @@ p <- ggplot(df_m) +
   geom_line(aes(loc, value, color = variable)) +
   geom_hline(aes(yintercept = 0)) +
   scale_size(range = c(0.1)) +
+  scale_colour_wsj()+
   facet_grid(chr ~ .) +
   ylab(NULL) +
   xlab(NULL) +
@@ -73,7 +75,9 @@ p <- ggplot(df_m) +
     panel.grid.minor = element_blank(),
     axis.line = element_line(colour = "black"),
     legend.key = element_blank(),
+    legend.text=element_text(size=12),
     legend.title = element_blank(),
+    legend.position = "bottom",
     strip.background = element_rect(
       colour = "white", fill = "white",
       size = 0.2
