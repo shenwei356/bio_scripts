@@ -7,11 +7,10 @@ Practical, reusable scripts for bioinformatics .
                     fasta_extract_by_pattern, fasta_common_seqs,
                     fasta_locate_motif, fasta_remove_duplicates,
                     fastx_translate, fasta_gc_skew.plot ...
-    util            tools for CSV/TSV files: csv2tab, csv_grep, csv_join,
-                    unique, intersection ...
+    util            moved to https://github.com/shenwei356/datakit
     plot            plot scripts: heatmap ...
 
-    blast           NCBI BLAST+ wrappers 
+    blast           NCBI BLAST+ wrappers
     file_formats    genbank->gtf, bam2gff, gff2fa ...
     enzyme          analysis of restrict enzymes
     protein         Batch compute pI of protein
