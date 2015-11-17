@@ -28,7 +28,7 @@ while (<IN>) {
     $seq     =~ s/\d+//g;
     #print "$seq\n";
     #print length($seq),"\n";
-    print ">gi|$gi|N/A|$version| $definition\n".(format_seq($seq, 60))."\n";
+    print ">gi|$gi|gb|$version| $definition\n".(format_seq($seq, 60))."\n";
 }
 $/ = "\n";
 close IN;
