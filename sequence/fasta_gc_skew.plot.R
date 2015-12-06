@@ -65,7 +65,7 @@ p <- ggplot(df_m) +
   scale_colour_wsj()+
   facet_grid(chr ~ .) +
   ylab(NULL) +
-  xlab(NULL) +
+  xlab("Position(bp)") + 
   scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval), labels = comma) +
   ggtitle(args$title) +
   theme_bw() +
