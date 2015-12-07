@@ -81,18 +81,25 @@ for record in SeqIO.parse(fh, 'fasta'):
         if args.type != '.' and gene['type'].lower() != args.type.lower():
             continue
         seq = ''
+        flag = ''
         if gene['strand'] == '+':
             if args.just:
                 if args.up_stream:
                     s = gene['start'] - args.up_stream - 1
                     e = gene['start'] - 1
+                    flag = 'jus..{}'.format(args.up_stream)
                 else:
                     s = gene['end']
                     e = gene['end'] + args.down_stream
+                    flag = 'jds..{}'.format(args.down_stream)
             else:
                 s = gene['start'] - args.up_stream - 1
                 s = 0 if s < 0 else s
                 e = gene['end'] + args.down_stream
+                if args.up_stream:
+                    flag = 'us..{}'.format(args.up_stream)
+                else:
+                    flag = 'ds..{}'.format(args.down_stream)
 
             s = 0 if s < 0 else s
             end = genomesize - 1 if e > genomesize - 1 else e
@@ -102,21 +109,33 @@ for record in SeqIO.parse(fh, 'fasta'):
                 if args.up_stream:
                     s = gene['end']
                     e = gene['end'] + args.up_stream
+                    flag = 'jus..{}'.format(args.up_stream)
                 else:
                     s = gene['start'] - args.down_stream - 1
                     e = gene['start'] - 1
+                    flag = 'jds..{}'.format(args.down_stream)
             else:
                 s = gene['start'] - args.down_stream - 1
                 s = 0 if s < 0 else s
                 e = gene['end'] + args.up_stream
+                if args.up_stream:
+                    flag = 'us..{}'.format(args.up_stream)
+                else:
+                    flag = 'ds..{}'.format(args.down_stream)
 
             s = 0 if s < 0 else s
             end = genomesize - 1 if e > genomesize - 1 else e
             seq = genome[s:e].reverse_complement()
+
+        if args.up_stream or args.down_stream:
+            id = '{}_{}..{}..{}_{}'.format(name, gene['start'], gene['end'],
+                                           gene['strand'], flag)
+        else:
+            id = '{}_{}..{}..{}'.format(name, gene['start'], gene['end'],
+                                        gene['strand'])
         SeqIO.write(
             SeqRecord(seq,
-                      id='{}_{}..{}..{}'.format(name, gene['start'],
-                                                gene['end'], gene['strand']),
+                      id=id,
                       description=gene['product']),
             sys.stdout,
             'fasta')
