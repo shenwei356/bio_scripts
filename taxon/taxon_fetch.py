@@ -17,6 +17,7 @@ Take home message:
            data = list(Entrez.parse(StringIO(data_xml)))
     3. pickle file was fragile. a flag file could be used to detect whether
        data is rightly dumped.
+    4. using multi-threads to accelerate fetching.
 
 '''
 
