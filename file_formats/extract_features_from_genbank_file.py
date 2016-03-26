@@ -107,8 +107,7 @@ if __name__ == '__main__':
 
                 elif args.outfmt == 'gtf':
                     frame = int(qualifiers['codon_start'][
-                        0
-                    ]) - 1 if 'codon_start' in qualifiers else 0
+                        0]) - 1 if 'codon_start' in qualifiers else 0
 
                     transcript_id = gene_id
 
@@ -116,17 +115,17 @@ if __name__ == '__main__':
                         gene_id, transcript_id)
 
                     if 'gene' in qualifiers:
-                        attribute += '; gene_id "{}"'.format(
-                            qualifiers['gene'][0])
+                        attribute += '; gene_id "{}"'.format(qualifiers[
+                            'gene'][0])
                     if 'protein_id' in f.qualifiers:
-                        attribute += '; protein_id "{}"'.format(
-                            qualifiers['protein_id'][0])
+                        attribute += '; protein_id "{}"'.format(qualifiers[
+                            'protein_id'][0])
 
                     if 'db_xref' in qualifiers:
                         for ext in qualifiers['db_xref']:
                             attribute += '; db_xref "{}"'.format(ext)
 
-                    attribute += '; product "{}"'.format(product)
+                    attribute += '; product "{}"; '.format(product)
 
                     sys.stdout.write('\t'.join(
                         [record.id, 'genbank', f.type, str(start + 1), str(
