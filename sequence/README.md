@@ -2,6 +2,9 @@
 
 ## FASTA
 
+my another tool [fakit](https://github.com/shenwei356/fakit) is recommended,
+which integrades most of the functions previously provided by these scripts.
+
 ### fasta2tab and tab2fasta
 
 [*fasta2tab*](https://github.com/shenwei356/bio_scripts/blob/master/sequence/fasta2tab) 
