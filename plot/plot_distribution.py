@@ -23,6 +23,7 @@ parser.add_argument('--width', type=int, default=8, help='Figure width')
 parser.add_argument('--height', type=int, default=6, help='Figure heigth')
 parser.add_argument('--x_lim', type=str, help='x_lim. format: "1,100"')
 parser.add_argument('--y_lim', type=str, help='y_lim. format: "1,100"')
+parser.add_argument('--bins', type=int, default=0, help='bins, 0 for None')
 
 parser.add_argument(
     '-t', '--title', type=str, default='Distribution Plot', help='Figure Title')
@@ -33,10 +34,10 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-if args.y_lim and not re.match('^\d+,\d+$', args.y_lim):
+if args.y_lim and not re.match('^[\d\.]+,[\d\.]+$', args.y_lim):
     print("Invalid option value for --y_lim. Example: --y_lim 1,100 ", file=sys.stderr)
     sys.exit(1)
-if args.x_lim and not re.match('^\d+,\d+$', args.x_lim):
+if args.x_lim and not re.match('^[\d\.]+,[\d\.]+$', args.x_lim):
     print("Invalid option value for --x_lim. Example: --y_lim 1,100 ", file=sys.stderr)
     sys.exit(1)
 
@@ -46,15 +47,18 @@ for line in args.infile:
 
 mpl.rc("figure", figsize=(args.width, args.height))
 
-figure = sns.distplot(data)
+if args.bins == 0:
+    args.bins = None
+    
+figure = sns.distplot(data, bins=args.bins)
 
 figure.set_title(args.title)
 figure.set_xlabel(args.xlabel)
 figure.set_ylabel(args.ylabel)
 
 if args.x_lim:
-    figure.set_xlim([int(x) for x in args.x_lim.split(',')])
+    figure.set_xlim([float(x) for x in args.x_lim.split(',')])
 if args.y_lim:
-    figure.set_ylim([int(y) for y in args.y_lim.split(',')])
+    figure.set_ylim([float(y) for y in args.y_lim.split(',')])
 
 plt.savefig(args.outfile)
