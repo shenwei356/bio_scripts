@@ -1,9 +1,10 @@
 # Manipulation on FASTA/Q format file
 
-## FASTA
+Recommend my toolkit [fakit](https://github.com/shenwei356/fakit), 
+a cross-platform and efficient toolkit for FASTA/Q file manipulation,
+which integrades most of the functions provided by these scripts.
 
-my another tool [fakit](https://github.com/shenwei356/fakit) is recommended,
-which integrades most of the functions previously provided by these scripts.
+## FASTA
 
 ### fasta2tab and tab2fasta
 
