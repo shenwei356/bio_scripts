@@ -1,6 +1,6 @@
 # Manipulation on FASTA/Q format file
 
-Recommend my toolkit [fakit](https://github.com/shenwei356/fakit), 
+Recommend my toolkit [SeqKit](https://github.com/shenwei356/seqkit), 
 a cross-platform and efficient toolkit for FASTA/Q file manipulation,
 which integrades most of the functions provided by these scripts.
 
