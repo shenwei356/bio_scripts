@@ -2,11 +2,13 @@
 # https://github.com/shenwei356/bio_scripts
 library(methods)
 library(proto)
+library(dplyr)
+library(tidyr)
 library(argparse)
 library(ggplot2)
-library(reshape2)
 library(scales)
 library(ggthemes)
+library(tidyr)
 
 shenwei356.theme <-  theme_bw() +
   theme(
@@ -39,7 +41,7 @@ shenwei356.theme <-  theme_bw() +
       face = "bold"
     ),
     plot.title = element_text(
-      size = 16,
+      size = 18,
       family = "arial",
       face = "bold"
     )
@@ -117,16 +119,16 @@ if (!args$gc_content && args$gc_skew) {
   df['gc'] = NULL
 }
 
-df_m <- melt(df, id.vars = c("chr", "loc"))
+df_m <- df %>% gather(group, value, -chr, -loc)
 
 p <- ggplot(df_m) +
-  geom_line(aes(loc, value, color = variable)) +
+  geom_line(aes(loc, value, color = group)) +
   geom_hline(aes(yintercept = 0), linetype = 2) +
   scale_size(range = c(0.1)) +
-  scale_colour_stata() +
+  scale_colour_wsj() +
   facet_grid(chr ~ .) +
   ylab(NULL) +
-  xlab("Position(bp)") +
+  xlab("Position (bp)") +
   scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval),
                      labels = comma) +
   ggtitle(args$title) +
