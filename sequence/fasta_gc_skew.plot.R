@@ -9,43 +9,7 @@ library(ggplot2)
 library(scales)
 library(ggthemes)
 library(tidyr)
-
-shenwei356.theme <-  theme_bw() +
-  theme(
-    panel.border = element_blank(),
-    panel.background = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.line.x = element_line(colour = "black", size = 0.8),
-    axis.line.y = element_line(colour = "black", size = 0.8),
-    axis.ticks.x = element_line(size = 0.8),
-    axis.ticks.y = element_line(size = 0.8),
-    #     axis.text.x = element_text(
-    #       angle = 30, hjust = 1, vjust = 1
-    #     ),
-    
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 12, face = "plain"),
-    legend.background = element_rect(fill = "transparent"),
-    strip.background = element_rect(
-      colour = "white",
-      fill = "white",
-      size = 0.2
-    ),
-    strip.text.x = element_text(size = 16),
-    
-    text = element_text(
-      size = 14,
-      family = "arial",
-      face = "bold"
-    ),
-    plot.title = element_text(
-      size = 18,
-      family = "arial",
-      face = "bold"
-    )
-  )
+library(swr)
 
 
 parser <-
@@ -132,7 +96,7 @@ p <- ggplot(df_m) +
   scale_x_continuous(breaks = seq(0, max(df$loc), by = args$x_interval),
                      labels = comma) +
   ggtitle(args$title) +
-  shenwei356.theme +
+  shenwei356.theme() +
   theme(legend.position = "top")
 
 ggsave(
