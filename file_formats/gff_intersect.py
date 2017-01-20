@@ -144,11 +144,11 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
                 overlap_data.append(x.value)
             else:
                 overlap_data.append([str(i) for i in
-                                     [s, e, strand2, overlap, round(100 * overlap / (end - start + 1), 1), t, frame,
+                                     [data[0], s, e, strand2, overlap, round(100 * overlap / (end - start + 1), 1), t, frame,
                                       x.value[-1]]])
 
         if args.split:
-            fh_out = open(os.path.join(outdir, '{}_{}..{}..{} {}.gff'.format(genome, start, end, strand, product.replace('/','_'))),
+            fh_out = open(os.path.join(outdir, '{}_{}..{}..{} {}.gff'.format(genome, start, end, strand, product.replace('/', '_'))),
                           'wt')
             fh_out.write('# {}'.format(line))
         else:
@@ -160,8 +160,8 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
         else:
             fh_out.write('# summary: {}\n'.format(stats))
             fh_out.write(
-                '\t'.join(['start', 'end', 'strand', 'overlap', 'overlap%', 'type', 'frame', 'attribute']) + '\n')
-            sorted_overlap_data = sorted(overlap_data, key=lambda o: (o[5], o[6], -float(o[4])))
+                '\t'.join(['chr', 'start', 'end', 'strand', 'overlap', 'overlap%', 'type', 'frame', 'attribute']) + '\n')
+            sorted_overlap_data = sorted(overlap_data, key=lambda o: (o[6], o[7], -float(o[5])))
 
         for overlap in sorted_overlap_data:
             fh_out.write('\t'.join(overlap) + '\n')
