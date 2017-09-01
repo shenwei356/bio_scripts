@@ -17,12 +17,16 @@ from bx.intervals.intersection import Intersecter, Interval
 parser = argparse.ArgumentParser(description="gff intersect",
                                  epilog="https://github.com/shenwei356/bio_scripts")
 
-parser.add_argument('query', type=str, help='gff file b (query)')
-parser.add_argument('subject', type=str, help='gff file a (subject)')
+parser.add_argument('query', type=str, help='query gff file')
+parser.add_argument('subject', type=str, help='subject gff file')
 parser.add_argument('-e', '--embeded', action='store_true',
-                    help='see what genes (subject) containing in specific regions (query)')
+                    help='see what genes (query) contained in specific regions (subject)')
+parser.add_argument('-c', '--cover', action='store_true',
+                    help='see what genes (query) containing specific regions (subject)')
 parser.add_argument('-s', '--split', action='store_true',
                     help='split results into multiple files')
+parser.add_argument('-o', '--split-dir', type=str,
+                    help='directory for split results')
 parser.add_argument('-eu', '--extend-upstream', type=int, default=0,
                     help='extend N bases in the upstream [0]')
 parser.add_argument('-ed', '--extend-downstream', type=int, default=0,
@@ -38,7 +42,11 @@ if args.extend_downstream and args.extend_downstream <= 0:
     sys.stderr.write('value of option --extend-downstream should be greater than 0\n')
     sys.exit(1)
 
-sys.stderr.write('building tree\n')
+if args.cover and args.embeded:
+    sys.stderr.write('only one of option -e/--embeded and -c/--cover allowed\n')
+    sys.exit(1)
+
+sys.stderr.write('building tree from {}\n'.format(args.subject))
 trees = dict()
 with gzip.open(args.subject) if args.subject.endswith('.gz') else open(args.subject) as fh:
     genome = ''
@@ -67,8 +75,12 @@ with gzip.open(args.subject) if args.subject.endswith('.gz') else open(args.subj
         trees[genome].add_interval(Interval(start, end, value=data))
 
 if args.split:
-    outdir = '{}.intersect@{}'.format(os.path.normpath(os.path.basename(args.query)),
+    if args.split_dir is None:
+        outdir = '{}.intersect@{}'.format(os.path.normpath(os.path.basename(args.query)),
                                       os.path.normpath(os.path.basename(args.subject)))
+    else:
+        outdir = args.split_dir
+
     if os.path.exists(outdir):
         shutil.rmtree(outdir)
     os.makedirs(outdir)
@@ -107,32 +119,34 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
                 if e >= end:
                     #   start ======== end
                     #     s ------------- e
-                    if args.embeded:
-                        continue
                     overlap = end - start + 1
-                    t = 'cover'
+                    t = 'embed'
+                    if args.cover:
+                        continue
                 else:
                     #  start ======== end
                     #   s ------ e
-                    if args.embeded:
+                    if args.embeded or args.cover:
                         continue
                     overlap = e - start + 1
-                    t = 'overlap.upstream' if strand == '+' else 'overlap.downstream'
+                    t = 'overlap.downstream' if strand == '+' else 'overlap.upstream'
             else:
                 if e >= end:
                     #   start ======== end
                     #           s ------ e
-                    if args.embeded:
+                    if args.embeded or args.cover:
                         continue
                     overlap = end - s + 1
-                    t = 'overlap.downstream' if strand == '+' else 'overlap.upstream'
+                    t = 'overlap.upstream' if strand == '+' else 'overlap.downstream'
                 else:
                     #   start ======== end
                     #          s --- e
+                    if args.embeded:
+                        continue
                     overlap = e - s + 1
-                    t = 'embed'
+                    t = 'cover'
 
-            if args.embeded:
+            if args.embeded or args.cover:
                 frame = '.'
             elif strand == '+':
                 frame = abs(s - start) % 3
@@ -140,22 +154,24 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
                 frame = abs(e - end) % 3
 
             stats[t] += 1
-            if args.embeded:
+            if args.embeded or args.cover:
                 overlap_data.append(x.value)
             else:
                 overlap_data.append([str(i) for i in
                                      [data[0], s, e, strand2, overlap, round(100 * overlap / (end - start + 1), 1), t, frame,
                                       x.value[-1]]])
+        if len(overlap_data) == 0:
+            continue
 
         if args.split:
-            fh_out = open(os.path.join(outdir, '{}_{}..{}..{} {}.gff'.format(genome, start, end, strand, product.replace('/', '_'))),
-                          'wt')
+            fh_out = open(os.path.join(outdir, '{}_{}..{}..{}_{}.gff'.format(genome,
+                        start, end, strand, product.replace('/', '_').replace('"', ''))), 'wt')
             fh_out.write('# {}'.format(line))
         else:
             fh_out = sys.stdout
             fh_out.write('>{}'.format(line))
 
-        if args.embeded:
+        if args.embeded or args.cover:
             sorted_overlap_data = sorted(overlap_data, key=lambda o: (o[0], o[1]))
         else:
             fh_out.write('# summary: {}\n'.format(stats))
@@ -165,7 +181,6 @@ with gzip.open(args.query) if args.query.endswith('.gz') else open(args.query) a
 
         for overlap in sorted_overlap_data:
             fh_out.write('\t'.join(overlap) + '\n')
-        fh_out.write('\n')
 
         if args.split:
             fh_out.close()
