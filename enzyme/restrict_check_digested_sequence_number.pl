@@ -6,7 +6,7 @@
 # https://github.com/shenwei356/bio_scripts/
 
 # embossre.enz
-#   ftp://ftp.neb.com/pub/rebase/
+#   ftp://ftp.neb.com/pub/rebase/emboss_e.\d+
 
 use strict;
 use File::Basename;

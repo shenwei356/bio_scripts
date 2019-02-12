@@ -3,6 +3,7 @@
 
 import sys
 import argparse
+import gzip
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     types = set(args.type.lower().split(','))
-    with open(args.gbkfile) as fh:
+    with gzip.open(args.gbkfile) if args.gbkfile.endswith('.gz') else open(args.gbkfile) as fh:
         records = SeqIO.parse(fh, "genbank")
         for record in records:
             for f in record.features:
@@ -68,6 +69,11 @@ if __name__ == '__main__':
                     product = qualifiers['product'][0]
                 else:
                     product = ''
+
+                if 'note' in qualifiers:
+                    note = qualifiers['note'][0]
+                else:
+                    note = ''
 
                 if 'gene' in qualifiers:
                     gene_id = qualifiers['gene'][0]
@@ -107,18 +113,15 @@ if __name__ == '__main__':
 
                     attribute = 'gene_id "{}"; transcript_id "{}"'.format(gene_id, transcript_id)
 
-                    if 'gene' in qualifiers:
-                        attribute += '; gene_id "{}"'.format(qualifiers['gene'][0])
-
-                    if 'gene' in qualifiers:
-                        attribute += '; gene_id "{}"'.format(qualifiers['gene'][0])
-
                     if 'protein_id' in f.qualifiers:
                         attribute += '; protein_id "{}"'.format(qualifiers['protein_id'][0])
 
                     if 'db_xref' in qualifiers:
                         for ext in qualifiers['db_xref']:
                             attribute += '; db_xref "{}"'.format(ext)
+
+                    if 'note' in f.qualifiers:
+                        attribute += '; note "{}"'.format(qualifiers['note'][0])
 
                     attribute += '; product "{}"; '.format(product)
 
